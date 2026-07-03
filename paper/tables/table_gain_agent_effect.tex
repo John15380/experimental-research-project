@@ -1,0 +1,21 @@
+\begin{table*}[tb]
+  \caption{收益域代理角色效应检验（置换检验，双侧；各条件$n=50$）}
+  \label{tab:gain_agent_effect}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.2pt}
+  \begin{tabular}{lrrrrrrrrr}
+    \toprule
+    模型 & Self均值 & Inv均值 & Vis均值 & $\Delta_{Inv-Self}$ & $p$ & $q_{BH}$ & $\Delta_{Vis-Self}$ & $p$ & $q_{BH}$ \\
+    \midrule
+    DeepSeek-V4-Flash & 3.92 & 4.14 & 4.46 & +0.22 & 0.698 & 0.997 & +0.54 & 0.314 & 0.628 \\
+    DeepSeek-V4-Pro & 3.36 & 3.74 & 3.74 & +0.38 & 0.134 & 0.334 & +0.38 & 0.112 & 0.334 \\
+    Grok-4 & 4.00 & 4.00 & 4.00 & +0.00 & 1.000 & 1.000 & +0.00 & 1.000 & 1.000 \\
+    Kimi-k2 & 8.48 & 8.14 & 8.56 & -0.34 & 0.420 & 0.699 & +0.08 & 0.842 & 1.000 \\
+    GPT-4.1 & 4.92 & 4.66 & 5.22 & -0.26 & 0.004 & \textbf{0.019} & +0.30 & $<0.001$ & \textbf{$<0.001$} \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.25em}
+
+  \parbox{0.96\textwidth}{\footnotesize 注：$\Delta>0$表示相对于Self条件更谨慎，$\Delta<0$表示更冒险。置换检验以$N_{\text{safe}}$均值差为统计量，迭代20,000次，随机种子固定；$q_{BH}$为本表10个成对检验的Benjamini-Hochberg校正值。}
+\end{table*}

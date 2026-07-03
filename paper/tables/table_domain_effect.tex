@@ -1,0 +1,22 @@
+\begin{table}[tb]
+  \caption{损益域框架效应检验结果}
+  \label{tab:domain_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lrrlrrr}
+    \toprule
+    模型 & 收益域 & 损失域 & 偏移方向 & $U$ & $p$ & $q_{BH}$ \\
+    \midrule
+    DeepSeek-V4-Flash & 4.17 & 4.54 & +0.37 & 10755.0 & 0.499 & 0.624 \\
+    DeepSeek-V4-Pro & 3.61 & 4.12 & +0.51 & 8936.5 & \textbf{0.001} & \textbf{0.002} \\
+    Grok-4 & 4.00 & 4.00 & 0.00 & -- & 1.000 & 1.000 \\
+    Kimi-k2 & 8.39 & 9.42 & +1.03 & 3794.5 & \textbf{$<0.001$} & \textbf{0.002} \\
+    GPT-4.1 & 4.93 & 6.47 & +1.54 & 5927.0 & \textbf{$<0.001$} & \textbf{0.002} \\
+    \bottomrule
+  \end{tabular}}
+  \vspace{0.25em}
+
+  \parbox{0.96\linewidth}{\footnotesize 注：$q_{BH}$为本表5个模型检验的Benjamini-Hochberg校正值。}
+\end{table}

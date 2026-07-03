@@ -1,0 +1,94 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}[x=1cm,y=1cm,font=\tiny]
+\path[use as bounding box] (0.05,1.10) rectangle (11.72,-2.55);
+\node[font=\tiny] at (6.90,0.92) {single-call minus batch-call mean};
+\node[rotate=45, anchor=west] at (2.46,0) {G/Self};
+\node[rotate=45, anchor=west] at (3.98,0) {G/Inv};
+\node[rotate=45, anchor=west] at (5.50,0) {G/Vis};
+\node[rotate=45, anchor=west] at (7.02,0) {L/Self};
+\node[rotate=45, anchor=west] at (8.54,0) {L/Inv};
+\node[rotate=45, anchor=west] at (10.06,0) {L/Vis};
+\node[anchor=east] at (2.22,-0.41) {DeepSeek-V4-Flash};
+\filldraw[fill=grokc!35!white, draw=white] (2.34,-0.62) rectangle (3.86,-0.20);
+\node at (3.10,-0.41) {$+1.4$\;**};
+\filldraw[fill=grokc!31!white, draw=white] (3.86,-0.62) rectangle (5.38,-0.20);
+\node at (4.62,-0.41) {$+1.1$\;**};
+\filldraw[fill=grokc!46!white, draw=white] (5.38,-0.62) rectangle (6.90,-0.20);
+\node at (6.14,-0.41) {$+2.1$\;***};
+\filldraw[fill=riskred!28!white, draw=white] (6.90,-0.62) rectangle (8.42,-0.20);
+\node at (7.66,-0.41) {$-0.9$\;*};
+\filldraw[fill=riskred!20!white, draw=white] (8.42,-0.62) rectangle (9.94,-0.20);
+\node at (9.18,-0.41) {$-0.4$\;};
+\filldraw[fill=riskred!16!white, draw=white] (9.94,-0.62) rectangle (11.46,-0.20);
+\node at (10.70,-0.41) {$-0.1$\;};
+\node[anchor=east] at (2.22,-0.83) {DeepSeek-V4-Pro};
+\filldraw[fill=grokc!58!white, draw=white] (2.34,-1.04) rectangle (3.86,-0.62);
+\node at (3.10,-0.83) {$+2.9$\;***};
+\filldraw[fill=grokc!72!white, draw=white] (3.86,-1.04) rectangle (5.38,-0.62);
+\node at (4.62,-0.83) {$+3.9$\;***};
+\filldraw[fill=grokc!61!white, draw=white] (5.38,-1.04) rectangle (6.90,-0.62);
+\node at (6.14,-0.83) {$+3.2$\;***};
+\filldraw[fill=grokc!63!white, draw=white] (6.90,-1.04) rectangle (8.42,-0.62);
+\node at (7.66,-0.83) {$+3.3$\;***};
+\filldraw[fill=grokc!55!white, draw=white] (8.42,-1.04) rectangle (9.94,-0.62);
+\node at (9.18,-0.83) {$+2.7$\;***};
+\filldraw[fill=grokc!90!white, draw=white] (9.94,-1.04) rectangle (11.46,-0.62);
+\node at (10.70,-0.83) {$+5.1$\;***};
+\node[anchor=east] at (2.22,-1.25) {Grok-4};
+\filldraw[fill=grokc!77!white, draw=white] (2.34,-1.46) rectangle (3.86,-1.04);
+\node at (3.10,-1.25) {$+4.2$\;***};
+\filldraw[fill=grokc!60!white, draw=white] (3.86,-1.46) rectangle (5.38,-1.04);
+\node at (4.62,-1.25) {$+3.1$\;***};
+\filldraw[fill=grokc!77!white, draw=white] (5.38,-1.46) rectangle (6.90,-1.04);
+\node at (6.14,-1.25) {$+4.2$\;***};
+\filldraw[fill=grokc!72!white, draw=white] (6.90,-1.46) rectangle (8.42,-1.04);
+\node at (7.66,-1.25) {$+3.9$\;***};
+\filldraw[fill=grokc!56!white, draw=white] (8.42,-1.46) rectangle (9.94,-1.04);
+\node at (9.18,-1.25) {$+2.8$\;***};
+\filldraw[fill=grokc!75!white, draw=white] (9.94,-1.46) rectangle (11.46,-1.04);
+\node at (10.70,-1.25) {$+4.1$\;***};
+\node[anchor=east] at (2.22,-1.67) {Kimi-k2};
+\filldraw[fill=grokc!15!white, draw=white] (2.34,-1.88) rectangle (3.86,-1.46);
+\node at (3.10,-1.67) {$+0.0$\;};
+\filldraw[fill=grokc!39!white, draw=white] (3.86,-1.88) rectangle (5.38,-1.46);
+\node at (4.62,-1.67) {$+1.7$\;***};
+\filldraw[fill=grokc!20!white, draw=white] (5.38,-1.88) rectangle (6.90,-1.46);
+\node at (6.14,-1.67) {$+0.3$\;};
+\filldraw[fill=riskred!22!white, draw=white] (6.90,-1.88) rectangle (8.42,-1.46);
+\node at (7.66,-1.67) {$-0.5$\;};
+\filldraw[fill=grokc!18!white, draw=white] (8.42,-1.88) rectangle (9.94,-1.46);
+\node at (9.18,-1.67) {$+0.2$\;};
+\filldraw[fill=grokc!23!white, draw=white] (9.94,-1.88) rectangle (11.46,-1.46);
+\node at (10.70,-1.67) {$+0.5$\;*};
+\node[anchor=east] at (2.22,-2.09) {GPT-4.1};
+\filldraw[fill=grokc!47!white, draw=white] (2.34,-2.30) rectangle (3.86,-1.88);
+\node at (3.10,-2.09) {$+2.2$\;***};
+\filldraw[fill=riskred!25!white, draw=white] (3.86,-2.30) rectangle (5.38,-1.88);
+\node at (4.62,-2.09) {$-0.7$\;*};
+\filldraw[fill=grokc!44!white, draw=white] (5.38,-2.30) rectangle (6.90,-1.88);
+\node at (6.14,-2.09) {$+2.0$\;***};
+\filldraw[fill=riskred!40!white, draw=white] (6.90,-2.30) rectangle (8.42,-1.88);
+\node at (7.66,-2.09) {$-1.7$\;***};
+\filldraw[fill=riskred!73!white, draw=white] (8.42,-2.30) rectangle (9.94,-1.88);
+\node at (9.18,-2.09) {$-3.9$\;***};
+\filldraw[fill=grokc!20!white, draw=white] (9.94,-2.30) rectangle (11.46,-1.88);
+\node at (10.70,-2.09) {$+0.3$\;};
+\end{tikzpicture}

@@ -1,0 +1,41 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=0.18\textheight,
+  ybar,
+  ymin=0,
+  ymax=10.5,
+  ylabel={$N_{\mathrm{safe}}$},
+  symbolic x coords={G/Self,G/Inv,G/Vis,L/Self,L/Inv,L/Vis},
+  xtick=data,
+  enlarge x limits=0.10,
+  xticklabel style={font=\tiny, rotate=35, anchor=east},
+  tick label style={font=\tiny},
+  label style={font=\scriptsize},
+  legend style={font=\tiny, draw=none, fill=none, at={(0.5,1.05)}, anchor=south, legend columns=3},
+  ymajorgrids=true,
+  grid style={gridgray},
+]
+\addplot[ybar, bar width=8pt, fill=kimic, draw=none] coordinates {(G/Self,8.480) (G/Inv,8.140) (G/Vis,8.560) (L/Self,9.380) (L/Inv,9.500) (L/Vis,9.380)};
+\addplot[black, dashed, sharp plot, forget plot] coordinates {(G/Self,4) (L/Vis,4)};
+\end{axis}
+\end{tikzpicture}

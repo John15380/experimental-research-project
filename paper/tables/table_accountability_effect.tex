@@ -1,0 +1,22 @@
+\begin{table}[tb]
+  \caption{问责性调节效应检验结果（Kruskal-Wallis H检验）}
+  \label{tab:accountability_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{2.2pt}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    模型 & Self均值 & Agent-Inv均值 & Agent-Vis均值 & $H$ & $p$ & $q_{BH}$ \\
+    \midrule
+    DeepSeek-V4-Flash & 4.05 & 4.50 & 4.52 & 2.57 & 0.277 & 0.462 \\
+    DeepSeek-V4-Pro & 3.69 & 4.05 & 3.86 & 7.25 & 0.027 & 0.068 \\
+    Grok-4 & 4.00 & 4.00 & 4.00 & 0.00 & 1.000 & 1.000 \\
+    Kimi-k2 & 8.93 & 8.82 & 8.97 & 0.60 & 0.743 & 0.929 \\
+    GPT-4.1 & 5.77 & 5.08 & 6.25 & 45.73 & \textbf{$<0.001$} & \textbf{0.005} \\
+    \bottomrule
+  \end{tabular}}
+  \vspace{0.25em}
+
+  \parbox{0.96\linewidth}{\footnotesize 注：$q_{BH}$为本表5个模型检验的Benjamini-Hochberg校正值。}
+\end{table}

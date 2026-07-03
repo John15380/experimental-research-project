@@ -1,0 +1,170 @@
+\documentclass[journal]{vgtc}
+
+\onlineid{0}
+
+\vgtccategory{Research}
+
+%% Paper title.
+\title{代理决策角色与问责压力改变大语言模型的风险偏好\\
+——基于前景理论的实验证据}
+
+\author{%
+  胡江涛、
+  岳瀚阳、
+  冯嘉逸、
+  孙昕、
+  周起帆
+}
+
+\authorfooter{}
+
+\manuscriptnote{}
+
+%% Abstract section.
+\abstract{%
+随着大语言模型进入投顾、交易辅助和金融决策系统，其替他人承担风险时是否会改变偏好，成为AI金融治理中的重要问题。
+本研究结合前景理论与替他人决策研究，采用2（收益域/损失域）$\times$3（为自己/替他人且不可观察/替他人且可观察）被试间设计和Holt-Laury配对彩票范式，测试DeepSeek-V4-Flash、DeepSeek-V4-Pro、Grok-4、Kimi-k2和GPT-4.1五款模型。
+主实验获得1500组有效观测，并补充600组DeepSeek深度思考对照及逐题独立调用检验。
+结果显示，LLM风险偏好主要呈现模型异质性：Grok-4在整卷作答中接近风险中性，Kimi-k2高度保守，GPT-4.1对问责性与损失框架更敏感。
+收益域纯代理效应并不稳定；跨域合并后仅DeepSeek-V4-Pro呈现轻度谨慎偏移，GPT-4.1则在不可观察代理条件下风险放松、在可观察条件下转向保守。
+差中差检验进一步显示，GPT-4.1中可见性带来的谨慎化在损失域更强。
+本研究表明，LLM代理风险偏好不是固定属性，而会受到模型、问责线索、损益框架、推理模式和题目呈现方式共同塑造，为AI金融代理的风险审计提供了实验框架。
+}
+
+\keywords{大语言模型，风险偏好，代理决策，前景理论，安全对齐，问责压力}
+
+%% Tell graphicx where to find files for figures.
+\graphicspath{{figs/}{figures/}{pictures/}{images/}{./}}
+
+%% Packages
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[UTF8,fontset=fandol]{ctex}
+\usepackage[normalem]{ulem}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{calc}
+\usepackage{placeins}
+
+\AtBeginDocument{%
+  \crefname{figure}{图}{图}%
+  \Crefname{figure}{图}{图}%
+  \crefname{table}{表}{表}%
+  \Crefname{table}{表}{表}%
+  \crefformat{figure}{图#2#1#3}%
+  \Crefformat{figure}{图#2#1#3}%
+  \crefformat{table}{表#2#1#3}%
+  \Crefformat{table}{表#2#1#3}%
+}
+
+%% Remove mathptmx if it conflicts with ctex; ctex provides its own font setup.
+%% If you encounter font warnings, uncomment the next line and comment mathptmx.
+%% \usepackage{mathptmx}
+
+%% Patch abstract and references font size from \scriptsize to \small
+\makeatletter
+\patchcmd{\@maketitle}{\scriptsize\sffamily}{\small\sffamily}{}{}
+\patchcmd{\@maketitle}{\begin{center}\includegraphics{diamondrule}\end{center}}{}{}{}
+\patchcmd{\thebibliography}{\scriptsize}{\small}{}{}
+\setlength{\@fptop}{0pt}
+\setlength{\@dblfptop}{0pt}
+\renewcommand{\footnoterule}{}
+\makeatother
+
+% Use an APA-like bibliography list: author-year entries without numeric labels.
+\makeatletter
+\renewenvironment{thebibliography}[1]{%
+  \section*{\refname}%
+  \small%
+  \@mkboth{\MakeUppercase\refname}{\MakeUppercase\refname}%
+  \list{}{%
+    \setlength{\labelwidth}{0pt}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\leftmargin}{1.5em}%
+    \setlength{\itemindent}{-1.5em}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parsep}{0pt}%
+    \@openbib@code
+    \usecounter{enumiv}%
+    \let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}%
+  }%
+  \let\@biblabel\@gobble
+  \sloppy
+  \clubpenalty4000
+  \@clubpenalty \clubpenalty
+  \widowpenalty4000%
+  \interlinepenalty=10000%
+  \sfcode`\.\@m%
+}{%
+  \def\@noitemerr{\@latex@warning{Empty `thebibliography' environment}}%
+  \endlist%
+}
+\AtBeginDocument{%
+  \@ifundefined{backref}{}{\renewcommand*{\backref}[1]{}}%
+  \@ifundefined{backrefalt}{}{\renewcommand*{\backrefalt}[4]{}}%
+}
+\makeatother
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \thispagestyle{empty}
+  \vspace*{0.7cm}
+  
+  \includegraphics[width=0.60\textwidth]{figs/zju_title.png}\\[0.45cm]
+  \includegraphics[width=0.19\textwidth]{figs/zju_logo.png}\\[1.35cm]
+  
+  {\huge\sffamily\bfseries 实验研究导论-小组作业报告}\\[1.25cm]
+  
+  \Large
+  \renewcommand{\arraystretch}{1.25}
+  \setlength{\tabcolsep}{0pt}
+  \begin{tabular}{r@{\quad}c}
+    \multirow{3}{*}{\makebox[4.3cm][s]{\textbf{报告题目}}：} &
+      \makebox[8.8cm][c]{\bfseries 代理决策角色与问责压力改变}\\[0.08cm]
+    & \makebox[8.8cm][c]{\bfseries 大语言模型的风险偏好}\\[0.08cm]
+    & \makebox[8.8cm][c]{\bfseries ——基于前景理论的实验证据}\\[0.95cm]
+    \multirow{5}{*}{\makebox[4.3cm][s]{\textbf{组员姓名与学号}}：} &
+      \makebox[8.8cm][c]{孙昕（3230104196）}\\[0.10cm]
+    & \makebox[8.8cm][c]{岳瀚阳（3230104443）}\\[0.10cm]
+    & \makebox[8.8cm][c]{周起帆（3230104457）}\\[0.10cm]
+    & \makebox[8.8cm][c]{冯嘉逸（3230104516）}\\[0.10cm]
+    & \makebox[8.8cm][c]{胡江涛（3230104958）}\\[0.95cm]
+    \makebox[4.3cm][s]{\textbf{小组编号}}： &
+      \makebox[8.8cm][c]{第2组}
+  \end{tabular}
+  
+  \vfill
+\end{titlepage}
+\setcounter{page}{1}
+
+\makeatletter
+\renewcommand{\ps@plain}{%
+  \renewcommand{\@oddhead}{}%
+  \renewcommand{\@oddfoot}{\hfil\textrm{\thepage}\hfil}%
+  \renewcommand{\@evenhead}{}%
+  \renewcommand{\@evenfoot}{\hfil\textrm{\thepage}\hfil}%
+}
+\makeatother
+\pagestyle{plain}
+
+\input{sections/01_introduction}
+\input{sections/02_literature_review}
+\input{sections/03_experiment_design}
+\input{sections/04_results}
+\input{sections/05_discussion}
+\input{sections/appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{apalike}
+\bibliography{report}
+
+\end{document}

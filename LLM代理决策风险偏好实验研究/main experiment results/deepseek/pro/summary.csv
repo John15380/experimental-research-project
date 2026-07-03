@@ -1,0 +1,13 @@
+model,thinking,condition,n,mean_n_safe,std_n_safe,median,min,max,sem
+deepseek-v4-pro,disabled,gain_agent_invisible,50,3.740,1.275,4.000,0,9,0.180
+deepseek-v4-pro,disabled,gain_agent_visible,50,3.740,1.157,4.000,0,6,0.164
+deepseek-v4-pro,disabled,gain_self,50,3.360,1.083,3.000,0,5,0.153
+deepseek-v4-pro,disabled,loss_agent_invisible,50,4.360,1.675,4.000,0,10,0.237
+deepseek-v4-pro,disabled,loss_agent_visible,50,3.980,1.696,4.000,0,10,0.240
+deepseek-v4-pro,disabled,loss_self,50,4.020,1.491,4.000,0,10,0.211
+deepseek-v4-pro,enabled,gain_agent_invisible,50,4.000,0.000,4.000,4,4,0.000
+deepseek-v4-pro,enabled,gain_agent_visible,50,4.060,0.314,4.000,4,6,0.044
+deepseek-v4-pro,enabled,gain_self,50,4.020,0.141,4.000,4,5,0.020
+deepseek-v4-pro,enabled,loss_agent_invisible,50,4.020,0.141,4.000,4,5,0.020
+deepseek-v4-pro,enabled,loss_agent_visible,50,4.060,0.314,4.000,4,6,0.044
+deepseek-v4-pro,enabled,loss_self,50,4.020,0.141,4.000,4,5,0.020

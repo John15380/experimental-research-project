@@ -1,0 +1,7 @@
+model,thinking,condition,n,mean_n_safe,std_n_safe,median,min,max,sem
+kimi:kimi-k2-250905,disabled,gain_agent_invisible,50,8.140,2.109,9.000,0,10,0.298
+kimi:kimi-k2-250905,disabled,gain_agent_visible,50,8.560,1.358,9.000,4,9,0.192
+kimi:kimi-k2-250905,disabled,gain_self,50,8.480,1.741,9.000,0,9,0.246
+kimi:kimi-k2-250905,disabled,loss_agent_invisible,50,9.500,1.035,10.000,5,10,0.146
+kimi:kimi-k2-250905,disabled,loss_agent_visible,50,9.380,1.524,10.000,4,10,0.216
+kimi:kimi-k2-250905,disabled,loss_self,50,9.380,1.244,10.000,5,10,0.176

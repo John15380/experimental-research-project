@@ -1,0 +1,21 @@
+\begin{table*}[tb]
+  \caption{代理角色主效应检验结果（Mann-Whitney U检验）}
+  \label{tab:agent_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrlrrrl}
+    \toprule
+    模型 & Self均值 & Agent均值 & 偏移方向 & $U$统计量 & $p$ & $q_{BH}$ & 效应判定 \\
+    \midrule
+    DeepSeek-V4-Flash & 4.05 & 4.51 & +0.46（谨慎$\uparrow$） & 8911.0 & 0.115 & 0.288 & 不显著 \\
+    DeepSeek-V4-Pro & 3.69 & 3.96 & +0.27（谨慎$\uparrow$） & 8222.0 & \textbf{0.007} & \textbf{0.035} & \textbf{显著} \\
+    Grok-4 & 4.00 & 4.00 & 0.00 & -- & 1.000 & 1.000 & 无效应 \\
+    Kimi-k2 & 8.93 & 8.89 & -0.04 & 9893.5 & 0.867 & 1.000 & 不显著 \\
+    GPT-4.1 & 5.77 & 5.67 & -0.10 & 10219.0 & 0.711 & 1.000 & 不显著 \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.25em}
+
+  \parbox{0.96\textwidth}{\footnotesize 注：$q_{BH}$为本表5个模型检验的Benjamini-Hochberg校正值。}
+\end{table*}

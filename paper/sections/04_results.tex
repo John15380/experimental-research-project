@@ -1,0 +1,167 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{实验结果}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{数据说明与描述性统计}
+
+主实验共获得1500条有效观测：5款模型、6种条件、每个模型-条件50次独立无状态API会话。
+此外，DeepSeek-V4-Flash和DeepSeek-V4-Pro各增加6个条件下的50次深度思考模式调用，共600条对照观测。
+所有返回均成功解析为预定义JSON格式，解析错误率为0\%。
+每条记录包含10道Holt-Laury题目的选择序列、理由文本、实验条件、模型名称、思考模式和时间戳。
+切换次数检查未发现超过预设阈值的异常记录，因此正式分析未剔除样本。
+
+核心因变量为安全选择数$N_{\text{safe}}$，即10道题中选择较安全选项A的次数。
+风险中性基准约为$N_{\text{safe}}=4$；数值越高表示越风险规避，越低表示越风险寻求。
+\Cref{tab:descriptive}报告各模型在六种主实验条件下的均值、标准差、中位数和范围。
+
+\input{tables/table_descriptive.tex}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig01_mean_comparison.tex}
+  \caption{五款模型在六种实验条件下的平均安全选择数。虚线表示风险中性基准$N_{\text{safe}}=4$。}
+  \label{fig:mean_comparison}
+\end{figure}
+
+描述性结果已经显示出强烈模型异质性。
+Grok-4在整卷作答中始终给出$N_{\text{safe}}=4$，表现为风险中性且方差为0；Kimi-k2在所有条件下均远高于中性线，尤其在损失域接近量表上限；GPT-4.1和DeepSeek V4系列则更受条件变化影响。
+因此，后续假设检验均在模型内报告，并统一同时给出原始$p$值和Benjamini-Hochberg校正后的$q_{BH}$。
+这种呈现方式有两个考虑。
+首先，若直接将五款模型混合比较，模型身份本身会吞没角色和问责性操纵的影响，使H1和H2难以解释。
+其次，LLM重复调用并不等同于人类随机抽样，被试间方差更多反映同一模型在给定Prompt下的生成分布。
+因此，本文更重视模型内条件变化、校正后的显著性以及效应方向是否与理论假设一致，而不是仅依赖总体均值差异。
+
+\subsection{假设检验}
+
+\subsubsection{H1A/H1B：代理角色效应}
+
+H1A和H1B主要针对收益域内的代理偏移提出。
+\Cref{tab:gain_agent_effect}显示，收益域中DeepSeek-V4-Pro和DeepSeek-V4-Flash虽呈谨慎化方向，但校正后均不显著。
+GPT-4.1呈现最清晰但方向相反的条件性效应：不可观察代理条件低于Self条件（风险放松，$q_{BH}=0.019$），可观察代理条件高于Self条件（谨慎化，$q_{BH}<0.001$）。
+这意味着“替他人决策”本身并不对应单一方向，至少在GPT-4.1中必须同时考虑可观察性。
+
+\input{tables/table_gain_agent_effect.tex}
+
+作为补充，我们将收益域与损失域合并，比较Self条件与全部Agent条件。
+\Cref{tab:agent_effect}显示，校正后仅DeepSeek-V4-Pro存在轻度总体谨慎偏移（$q_{BH}=0.035$）。
+由于该检验跨越损益域，它只能作为代理角色总体效应的补充证据，不能替代收益域内的H1主检验。
+
+\input{tables/table_agent_effect.tex}
+
+\subsubsection{H2：问责性与损益域的调节}
+
+问责性检验首先比较Self、Agent-Invisible和Agent-Visible三类角色条件。
+\Cref{tab:accountability_effect}显示，GPT-4.1在三类条件之间差异显著（$q_{BH}=0.005$）；DeepSeek-V4-Pro虽有原始$p=0.027$，但BH校正后$q_{BH}=0.068$，因此仅能视为趋势。
+这一步说明问责性效应并非跨模型普遍存在。
+
+\input{tables/table_accountability_effect.tex}
+
+为直接检验H2所要求的损益域$\times$问责性模式，我们在Agent条件内部计算差中差（$L/G$分别表示损失域/收益域，$V/I$分别表示可观察/不可观察）：
+\[
+  \begin{aligned}
+  \text{DiD}
+  =(\bar N_{L,V}-\bar N_{L,I})
+  -(\bar N_{G,V}-\bar N_{G,I}).
+  \end{aligned}
+\]
+\Cref{tab:domain_accountability_interaction}显示，仅GPT-4.1在BH校正后仍显著（DiD=+1.22，$q_{BH}=0.025$）。
+也就是说，可见性带来的谨慎化在GPT-4.1的损失域中更强；其他模型未呈现同样模式。
+
+\input{tables/table_domain_accountability_interaction.tex}
+
+\begin{figure}[!htbp]
+  \centering
+  \makebox[\linewidth][c]{\hspace*{-0.140\linewidth}\resizebox{0.92\linewidth}{!}{\input{figs/tikz/fig04_gpt41_interaction.tex}}}
+  \caption{GPT-4.1中损益域与问责性的分化模式。}
+  \label{fig:gpt_interaction}
+\end{figure}
+
+\subsubsection{损益域框架效应}
+
+传统前景理论预测人类在损失域更可能风险寻求。
+但\Cref{tab:domain_effect}显示，DeepSeek-V4-Pro、Kimi-k2和GPT-4.1在损失域的$N_{\text{safe}}$均显著高于收益域，且BH校正后仍成立。
+这构成了本研究的“反前景理论”现象：多数模型面对损失语义时不是更冒险，而是更防御、更保守。
+
+\input{tables/table_domain_effect.tex}
+
+\begin{figure}[!ht]
+  \centering
+  \begin{minipage}{\linewidth}
+    \centering
+    \makebox[\linewidth][c]{\hspace*{-0.130\linewidth}\resizebox{0.98\linewidth}{!}{\input{figs/tikz/fig03_gpt41_distribution.tex}}}
+    \subcaption{GPT-4.1各条件下$N_{\text{safe}}$分布。}
+    \label{fig:gpt_distribution}
+  \end{minipage}
+  \vspace{0.1em}
+
+  \begin{minipage}{\linewidth}
+    \centering
+    \makebox[\linewidth][c]{\hspace*{-0.130\linewidth}\resizebox{0.98\linewidth}{!}{\input{figs/tikz/fig03_kimi_distribution.tex}}}
+    \subcaption{Kimi-k2各条件下$N_{\text{safe}}$分布。}
+    \label{fig:kimi_distribution}
+  \end{minipage}
+  \caption{GPT-4.1与Kimi-k2在六种实验条件下的安全选择数分布直方图。}
+  \label{fig:domain_distributions}
+\end{figure}
+
+\subsubsection{H3：模型间异质性}
+
+跨五款模型的Kruskal-Wallis检验显示，模型身份对$N_{\text{safe}}$具有很强解释力（$H=857.09,p=3.30\times10^{-184}$）。
+结合均值与分布，可以概括出三种行为轮廓：Grok-4在整卷作答中近似风险中性；Kimi-k2呈极度保守和天花板效应；GPT-4.1与DeepSeek V4系列更具情境敏感性。
+因此，H3获得支持，但其含义不是“所有LLM都有同一种风险偏好”，而是相反：风险偏好必须按模型、任务格式和提示语境分别审计。
+
+\subsection{附加与稳健性分析}
+
+\subsubsection{深度思考模式}
+
+DeepSeek V4系列的深度思考对照显示，开启thinking后两款模型的$N_{\text{safe}}$均向风险中性点收敛，BH校正后仍显著。
+这提示部分风险偏差可能来自快速语义响应；当模型显式计算期望值时，社会性线索和损失语义的影响会被削弱。
+
+\input{tables/table_thinking_effect.tex}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig09_deepseek_thinking.tex}
+  \caption{DeepSeek V4系列模型在关闭与开启深度思考模式下的安全选择数对比。}
+  \label{fig:deepseek_thinking}
+\end{figure}
+
+\subsubsection{决策理由文本}
+
+理由文本不能等同于模型真实内部机制，但可以作为事后解释和注意力线索。
+我们用预定义词典统计三类焦点：期望值与计算、客户与问责、风险与损失。
+\Cref{fig:text_analysis,fig:text_models}显示，代理条件下“客户与问责”词频上升，损失域中“风险与损失”词频上升；Grok-4更强调期望值计算，Kimi-k2更持续强调风险，GPT-4.1在可见代理条件下更频繁提及责任。
+这些文本线索与行为结果一致，但只能作为解释性证据。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig11_text_analysis.tex}
+  \caption{不同决策角色下的LLM认知焦点转移。}
+  \label{fig:text_analysis}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig12_text_models.tex}
+  \caption{不同行为原型模型的决策理由特征差异。}
+  \label{fig:text_models}
+\end{figure}
+
+\subsubsection{题目呈现方式}
+
+逐题独立调用检验表明，题目呈现方式会显著改变部分模型的绝对风险水平。
+\Cref{tab:sequence_effect}中DeepSeek-V4-Pro和Grok-4在逐题模式下更保守，GPT-4.1则呈现收益域更保守、损失域更冒险的方向性不对称。
+因此，整卷作答下的$N_{\text{safe}}$不应被解释为模型固定人格，而应被视为特定呈现方式下的行为估计。
+不过，序列效应没有抹除模型差异：Kimi-k2仍高度保守，GPT-4.1仍对条件敏感，DeepSeek系列仍受到推理模式和呈现方式共同影响。
+
+这一发现也解释了为什么LLM风险偏好测量不能完全照搬人类实验的呈现方式。
+在人类Holt-Laury实验中，连续呈现10道题通常被视为帮助被试理解概率梯度的标准做法；但对LLM而言，整卷呈现还会额外暴露题目结构，使模型可能识别到“从第几题开始应该切换”的模式，并据此生成更整齐的选择序列。
+逐题独立调用则削弱了这种结构线索，迫使模型在单题层面重新权衡概率、金额和语义标签，因此更容易暴露模型对局部文本线索的敏感性。
+
+从应用角度看，这意味着金融代理系统的风险审计应同时报告任务呈现格式。
+如果一个模型只在整卷作答中接近风险中性，而在逐题调用中明显更保守或更冒险，那么其部署风险取决于真实系统究竟是批量生成投资组合，还是在每次用户交互中逐项给出建议。
+本文将序列效应作为稳健性检验而非主实验因素，是因为主假设关注代理角色和问责线索；但结果提醒我们，未来研究应把整卷/逐题呈现正式纳入实验设计，并避免把特定界面下的$N_{\text{safe}}$均值解释为脱离任务格式的固定参数。
+
+\input{tables/table_sequence_effect.tex}
+
+\FloatBarrier

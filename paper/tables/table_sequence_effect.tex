@@ -1,0 +1,62 @@
+\begin{table*}[tbp]
+  \caption{序列效应稳健性检验结果（Mann-Whitney U检验，整卷作答 vs.\ 逐题独立调用）}
+  \label{tab:sequence_effect}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{2.2pt}
+  \begin{tabular}{llrrrrrrrr}
+    \toprule
+    模型 & 条件 & 整卷均值 & 逐题均值 & $\Delta$ & $U$ & $p$ & $q_{BH}$ & Sig. & $r$ \\
+    \midrule
+    DeepSeek-V4-Flash & gain\_self & 3.92 & 5.30 & +1.38 & 151.0 & 0.045 & 0.061 & n.s. & +0.40 \\
+    DeepSeek-V4-Flash & gain\_agent\_inv & 4.14 & 5.20 & +1.06 & 197.0 & 0.275 & 0.330 & n.s. & +0.21 \\
+    DeepSeek-V4-Flash & gain\_agent\_vis & 4.46 & 6.60 & +2.14 & 107.5 & 0.004 & \textbf{0.007} & ** & +0.57 \\
+    DeepSeek-V4-Flash & loss\_self & 4.18 & 3.30 & -0.88 & 317.5 & 0.175 & 0.219 & n.s. & -0.27 \\
+    DeepSeek-V4-Flash & loss\_agent\_inv & 4.86 & 4.50 & -0.36 & 257.0 & 0.895 & 0.951 & n.s. & -0.03 \\
+    DeepSeek-V4-Flash & loss\_agent\_vis & 4.58 & 4.50 & -0.08 & 255.5 & 0.919 & 0.951 & n.s. & -0.02 \\
+    DeepSeek-V4-Pro & gain\_self & 3.36 & 6.30 & \textbf{+2.94} & 4.0 & $<0.001$ & \textbf{$<0.002$} & *** & +0.98 \\
+    DeepSeek-V4-Pro & gain\_agent\_inv & 3.74 & 7.60 & \textbf{+3.86} & 8.5 & $<0.001$ & \textbf{$<0.002$} & *** & +0.97 \\
+    DeepSeek-V4-Pro & gain\_agent\_vis & 3.74 & 6.90 & \textbf{+3.16} & 5.5 & $<0.001$ & \textbf{$<0.002$} & *** & +0.98 \\
+    DeepSeek-V4-Pro & loss\_self & 4.02 & 7.30 & \textbf{+3.28} & 21.0 & $<0.001$ & \textbf{$<0.002$} & *** & +0.92 \\
+    DeepSeek-V4-Pro & loss\_agent\_inv & 4.36 & 7.10 & \textbf{+2.74} & 27.5 & $<0.001$ & \textbf{$<0.002$} & *** & +0.89 \\
+    DeepSeek-V4-Pro & loss\_agent\_vis & 3.98 & 9.10 & \textbf{+5.12} & 8.5 & $<0.001$ & \textbf{$<0.002$} & *** & +0.97 \\
+    Grok-4 & gain\_self & 4.00 & 8.20 & \textbf{+4.20} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Grok-4 & gain\_agent\_inv & 4.00 & 7.10 & \textbf{+3.10} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Grok-4 & gain\_agent\_vis & 4.00 & 8.20 & \textbf{+4.20} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Grok-4 & loss\_self & 4.00 & 7.90 & \textbf{+3.90} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Grok-4 & loss\_agent\_inv & 4.00 & 6.80 & \textbf{+2.80} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Grok-4 & loss\_agent\_vis & 4.00 & 8.10 & \textbf{+4.10} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    Kimi-k2 & gain\_self & 8.48 & 8.50 & +0.02 & 315.5 & 0.056 & 0.073 & n.s. & -0.26 \\
+    Kimi-k2 & gain\_agent\_inv & 8.14 & 9.80 & \textbf{+1.66} & 45.0 & $<0.001$ & \textbf{$<0.002$} & *** & +0.82 \\
+    Kimi-k2 & gain\_agent\_vis & 8.56 & 8.90 & +0.34 & 180.5 & 0.042 & 0.060 & n.s. & +0.28 \\
+    Kimi-k2 & loss\_self & 9.38 & 8.90 & -0.48 & 362.0 & 0.011 & \textbf{0.017} & * & -0.45 \\
+    Kimi-k2 & loss\_agent\_inv & 9.50 & 9.70 & +0.20 & 237.0 & 0.763 & 0.848 & n.s. & +0.05 \\
+    Kimi-k2 & loss\_agent\_vis & 9.38 & 9.90 & +0.52 & 217.5 & 0.363 & 0.419 & n.s. & +0.13 \\
+    GPT-4.1 & gain\_self & 4.92 & 7.10 & \textbf{+2.18} & 0.0 & $<0.001$ & \textbf{$<0.002$} & *** & +1.00 \\
+    GPT-4.1 & gain\_agent\_inv & 4.66 & 4.00 & -0.66 & 341.5 & 0.033 & 0.050 & n.s. & -0.37 \\
+    GPT-4.1 & gain\_agent\_vis & 5.22 & 7.20 & \textbf{+1.98} & 4.0 & $<0.001$ & \textbf{$<0.002$} & *** & +0.98 \\
+    GPT-4.1 & loss\_self & 6.62 & 4.90 & \textbf{-1.72} & 392.0 & 0.002 & \textbf{0.004} & ** & -0.57 \\
+    GPT-4.1 & loss\_agent\_inv & 5.50 & 1.56 & \textbf{-3.94} & 450.0 & $<0.001$ & \textbf{$<0.002$} & *** & -1.00 \\
+    GPT-4.1 & loss\_agent\_vis & 7.28 & 7.60 & +0.32 & 250.5 & 1.000 & 1.000 & n.s. & -0.00 \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.25em}
+
+  \parbox{0.98\textwidth}{\footnotesize 注：$q_{BH}$为本表30个检验的Benjamini-Hochberg校正值；Sig.按$q_{BH}$标注（* $q<0.05$，** $q<0.01$，*** $q<0.005$）。整卷作答$n=50$；逐题独立调用除GPT-4.1 loss\_agent\_inv（$n=9$）外均为$n=10$。}
+
+  \vspace{0.25em}
+  \begin{minipage}{\textwidth}
+    \centering
+    \makebox[\textwidth][c]{\resizebox{0.86\textwidth}{!}{\input{figs/tikz/fig13_sequence_all_models.tex}}}
+    \captionof{figure}{全模型序列效应对比（整卷作答 vs.\ 逐题独立）。}
+    \label{fig:sequence_all_models}
+  \end{minipage}
+
+  \vspace{0.15em}
+  \begin{minipage}{\textwidth}
+    \centering
+    \makebox[\textwidth][c]{\resizebox{0.84\textwidth}{!}{\input{figs/tikz/fig14_sequence_delta_heatmap.tex}}}
+    \captionof{figure}{序列效应Delta热力图（逐题独立调用减整卷作答）。}
+    \label{fig:sequence_heatmap}
+  \end{minipage}
+\end{table*}

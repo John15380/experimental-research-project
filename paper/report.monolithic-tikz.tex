@@ -1,0 +1,895 @@
+\documentclass[journal]{vgtc}
+
+\onlineid{0}
+
+\vgtccategory{Research}
+
+%% Paper title.
+\title{代理决策角色与问责压力改变大语言模型的风险偏好\\
+——基于前景理论的实验证据}
+
+\author{%
+  胡江涛,
+  岳瀚阳,
+  冯嘉逸,
+  孙昕, and
+  周起帆
+}
+
+\authorfooter{}
+
+\manuscriptnote{}
+
+%% Abstract section.
+\abstract{%
+大语言模型正被大规模部署于自动化投资顾问与算法交易等金融代理场景，然而其在代理角色下的风险偏好特征尚未得到系统性检验。
+本研究将前景理论的分析框架与人类替他人决策的行为经济学发现相结合，提出竞争性的算法谨慎偏移假设与道德风险偏移假设。
+实验采用Holt与Laury的经典风险偏好测量范式，通过2（收益域/损失域）$\times$ 3（为自己决策/替他人决策且不可观察/替他人决策且可观察）的被试间因子设计，对DeepSeek-Flash、DeepSeek-Pro、Grok-4、Kimi-k2和GPT-4.1五款主流大语言模型进行系统实验，每组条件重复50次独立会话，主实验共收集1500组有效观测，并补充600组DeepSeek深度思考模式对照样本。
+研究以安全选择数量和转换点为因变量，综合运用非参数检验、模型间比较、序列效应稳健性检验和决策理由文本的量化内容分析，识别LLM代理决策中风险偏好的偏移方向与机制。
+结果显示，模型间风险偏好存在极显著异质性：Grok-4稳定贴近风险中性，Kimi-k2表现出极端保守倾向，GPT-4.1则对问责性和损失框架高度敏感。
+DeepSeek-Pro在代理角色下出现显著谨慎偏移，GPT-4.1在不可观察代理条件下呈现道德风险式放松、在可观察条件下转向强烈保守。
+深度思考模式会使DeepSeek系列模型显著回归风险中性，提示LLM风险偏差可被显式推理过程调节。
+本研究为AI金融代理的行为审计和风险管控提供了可操作的实证框架，同时将替他人决策的理论边界从人类被试拓展至大语言模型这一新型决策主体。
+}
+
+\keywords{大语言模型，风险偏好，代理决策，前景理论，安全对齐，问责压力}
+
+%% Tell graphicx where to find files for figures.
+\graphicspath{{figs/}{figures/}{pictures/}{images/}{./}}
+
+%% Packages
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[UTF8,fontset=fandol]{ctex}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+
+%% Remove mathptmx if it conflicts with ctex; ctex provides its own font setup.
+%% If you encounter font warnings, uncomment the next line and comment mathptmx.
+%% \usepackage{mathptmx}
+
+%% Patch abstract and references font size from \scriptsize to \small
+\makeatletter
+\patchcmd{\@maketitle}{\scriptsize\sffamily}{\small\sffamily}{}{}
+\patchcmd{\thebibliography}{\scriptsize}{\small}{}{}
+\setlength{\@fptop}{0pt}
+\setlength{\@dblfptop}{0pt}
+\makeatother
+
+\begin{document}
+
+\makeatletter
+\renewcommand{\ps@plain}{%
+  \renewcommand{\@oddhead}{}%
+  \renewcommand{\@oddfoot}{\hfil\textrm{\thepage}\hfil}%
+  \renewcommand{\@evenhead}{}%
+  \renewcommand{\@evenfoot}{\hfil\textrm{\thepage}\hfil}%
+}
+\makeatother
+\pagestyle{plain}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\firstsection{引言}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{研究背景与研究意义}
+
+大语言模型正在以前所未有的速度渗透至经济决策的核心地带。
+从自动化投资顾问和算法交易系统，到信贷审批与保险定价，LLM已从纯粹的信息处理工具演化为具有实质性决策权限的自主代理。
+Lopez-Lira与Tang的先驱性工作表明，ChatGPT能够显著预测股票收益，其表现优于传统情感分析方法~\cite{LopezLira2023Can}。
+Fatouros等人提出的MarketSenseAI框架利用GPT-4的链式推理能力，在S\&P 100股票上实现了10\%至30\%的超额收益~\cite{Fatouros2024Can}。
+Yu等人设计的FinMem框架进一步通过分层记忆与角色设定构建了具备交易策略能力的LLM代理~\cite{Yu2023FinMem}。
+Saha等人的综述系统梳理了LLM代理在投资管理中的应用版图，同时指出了鲁棒性、可解释性和实际部署等尚未解决的挑战~\cite{Saha2025Large}。
+上述进展共同描绘了一幅清晰的图景，即LLM代理正在成为金融市场中不可忽视的参与力量。
+
+然而，这一趋势也催生了一个紧迫但尚未得到充分回答的问题——当LLM以代理人身份替他人做出风险决策时，其风险偏好是否会发生系统性偏移？
+这一问题的重要性体现在三个层面。
+第一，在实践层面，如果LLM在代理角色下表现出系统性保守或系统性激进的偏差，将直接影响数以亿计的投资者的资产安全。
+第二，在理论层面，行为经济学已通过大量实验证实人类在替他人决策时存在显著的风险偏移效应，Polman与Wu的元分析纳入了71篇论文中的128个效应量（总计14443个观测值），确认了该效应的存在同时揭示了研究间的高度异质性~\cite{Polman2020Decision}。
+然而，LLM作为一类缺乏真实财务痛感和声誉焦虑的新型决策主体，其代理决策行为是否遵循人类的行为规律，是一个有待检验的理论问题。
+第三，在AI安全治理层面，主流LLM均经历了大规模的安全对齐训练。Ouyang等人通过人类反馈的强化学习（RLHF）使模型与用户意图对齐~\cite{Ouyang2022Training}，Bai等人提出的Constitutional AI方法进一步通过AI自我反馈实现无害化训练~\cite{Bai2022Constitutional}。
+这些机制可能在代理场景中被异常激活，产生难以预见的风险偏好偏移。
+
+为应对上述挑战，本文以Kahneman与Tversky的前景理论~\cite{Kahneman1979Prospect}和LLM行为偏差的最新发现为理论起点，对照相关文献，聚焦LLM安全对齐机制的潜在行为后果，通过严格的实验设计系统检验LLM在代理决策中的风险偏好变化。
+
+\subsection{研究问题}
+
+本研究聚焦的核心问题如下：
+
+RQ1: 大语言模型在为他人代理风险决策时，相较于为自身决策，其风险偏好是否发生系统性偏移？
+
+RQ2: 该偏移的方向与幅度是否受到损益情境和问责压力（委托人是否可观察决策过程）的调节？
+
+\subsection{理论逻辑与研究假设}
+
+本研究的理论出发点如下。
+
+第一点是 LLM 底层的安全对齐机制。
+以RLHF和Constitutional AI为代表的训练范式，其核心目标之一是抑制模型生成有害、极端或高风险的建议~\cite{Ouyang2022Training,Bai2022Constitutional}。
+该目标在预训练和微调阶段以参数级约束的形式嵌入模型权重。
+当LLM被赋予代理角色，需要为委托人的利益做出风险判断时，安全对齐所塑造的保守倾向可能被角色设定中的责任暗示所放大——模型可能将替他人决策解读为一种需要格外审慎的情境，从而产生过度的风险规避。
+我们将这一机制概括为算法谨慎偏移假设：
+\begin{quote}
+\textbf{H1A（算法谨慎偏移假设）：} 在收益域中，LLM以代理人身份替他人决策时，相较于为自己决策，将表现出更高的风险规避水平，表现为安全选择数量的显著增加。
+\end{quote}
+
+然而，这一假设与人类社会的相关研究不符，因此我们进一步进行探究。
+行为经济学的实证研究反复表明，人类代理人在替他人决策时，其风险偏好的偏移方向取决于制度约束与心理机制的复杂交互。
+Fullbrunn与Luhan发现有限责任制度（决策者仅参与收益而不承担损失）会压倒责任感，导致代理人为他人承担更高风险~\cite{Fullbrunn2019Responsibility}。
+Stone等人的研究表明后悔顾虑在两种决策角色下均增加风险规避~\cite{Stone2002Risk}，而Batteux等人则发现代理决策中的风险偏好更接近期望值中性，主观风险偏好被削弱~\cite{Batteux2017Risk}。
+对于LLM而言，它没有真实的财富损益体验，也不存在人类代理人的声誉焦虑或法律问责恐惧——至少在无观察者的条件下如此。
+这意味着LLM在代理角色下可能出现与人类相反的偏移方向：由于缺乏对委托人损失的真切痛感，LLM可能对高风险选项中的高收益端赋予不成比例的注意力，从而表现出更强的风险寻求倾向。
+我们将这一竞争性机制概括为道德风险偏移假设：
+\begin{quote}
+\textbf{H1B（道德风险偏移假设）：} 在收益域中，LLM以代理人身份替他人决策时，相较于为自己决策，将表现出更高的风险寻求水平，表现为安全选择数量的显著减少。
+\end{quote}
+
+H1A和H1B构成了一对相互排斥的核心假设，其实证检验结果将揭示安全对齐机制与道德风险机制在LLM代理决策中的相对主导地位。
+
+第二点是问责压力的调节效应。
+在人类代理决策中，当委托人能够观察代理人的每一步选择时，问责压力会显著改变代理人的行为模式。
+Fullbrunn与Luhan在后续研究中进一步确认了责任感的调节作用~\cite{Fullbrunn2019Responsibility}，Buckle等人的实验则发现人均捐赠金额而非委托人数量产生了显著的谨慎效应~\cite{Buckle2024Needs}。
+从理论逻辑推演，问责压力（可观察性）应当强化LLM在代理角色下的现有行为倾向：如果H1A成立（算法谨慎偏移主导），则可观察性应进一步放大谨慎程度；如果H1B成立（道德风险偏移主导），则可观察性应抑制过度的风险寻求。
+然而，前景理论的一个经典预测是在损失域中，人类决策者的风险偏好会发生反转——在损失域中倾向于风险寻求，即所谓反射效应。
+当代理角色与损失情境叠加时，问责压力的作用方向可能变得更为复杂：代理人在损失域中可能因为害怕被委托人责备而采取更为保守的策略以规避确定性损失，也可能因为试图翻盘而冒更大的风险。
+据此，我们提出问责压力与损益域交互的调节假设：
+\begin{quote}
+\textbf{H2（问责压力与损益域交互调节假设）：} 问责压力（可观察性）在收益域与损失域中对LLM代理风险偏好的调节方向相反。在收益域中，可观察性将强化主导偏移方向（加剧H1A或抑制H1B）；在损失域中，可观察性将促使LLM向更加审慎的方向偏移，以减少对委托人的可见损失。
+\end{quote}
+
+第三点是模型间的异质性。
+不同LLM在架构设计、预训练语料分布、RLHF实施方案和安全对齐强度上存在显著差异。
+Qi等人的研究揭示即使是少量对抗性微调样本也能破坏LLM的安全对齐，甚至良性数据的微调也可能无意中降低安全性~\cite{Qi2024Finetuning}。
+McIntosh等人则发现RLHF无法完全缓解意识形态条件化提示的影响，且其代表性不足以涵盖多元人类价值观~\cite{McIntosh2024Inadequacy}。
+Liu等人在ACL上的工作表明经过RLHF微调的模型在人格引导生成中更易被操控~\cite{Liu2024Evaluating}。
+Wu等人揭示了指令微调如何将预训练知识向用户导向任务旋转~\cite{Wu2024Language}。
+这些发现共同指向一个可能性：不同厂商和不同训练策略下产出的LLM，其代理决策风险偏好可能存在系统性差异。
+据此，我们提出模型间异质性假设：
+\begin{quote}
+\textbf{H3（模型间异质性假设）：} 不同架构和训练策略的LLM在代理决策风险偏好上存在显著差异，表现为模型间在相同实验条件下的安全选择数量和转换点分布上的统计显著性差别。
+\end{quote}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{文献综述}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+本研究坐落在三个交叉文献脉络的交汇点上：LLM的行为偏差与风险决策特征、人类替他人决策的风险偏移效应，以及LLM的金融代理应用与安全对齐机制。
+以下分别梳理三条脉络的核心发现与研究缺口。
+
+\subsection{大语言模型的风险决策与行为偏差}
+
+大语言模型的风险决策行为已成为计算社会科学和人工智能行为评估领域最活跃的前沿方向之一。
+这一研究方向的兴起建立在一个根本性观察之上：LLM不仅能够处理语言，还在经济决策任务中展现出系统性的、非随机的行为模式。
+
+Kahneman与Tversky的前景理论~\cite{Kahneman1979Prospect}以及不确定性下的启发式与偏差研究~\cite{Tversky1974Judgment}为这一方向提供了经典的理论基准。
+前景理论揭示了人类在风险决策中系统性偏离预期效用理论的三个核心规律：在收益域表现出风险厌恶，在损失域表现出风险寻求（反射效应），以及对小概率事件的过度加权。
+这构成了评估LLM风险行为是否复刻人类偏差的重要标准。
+
+近期，Zhang等人将累积前景理论的分析框架直接应用于LLM的行为建模，让一系列LLM完成基于确定性等价范式的认知心理学实验~\cite{Zhang2025Using}。
+他们发现LLM的行为在很大程度上与人类一致：跨模型可观察到风险态度的四重模式，且根据LLM数据拟合的价值函数和权重函数满足累积前景理论的形式化要求。
+这一发现首次从计算建模层面确认了LLM与人类在风险决策结构上的深层相似性。
+
+Payne进一步将前景理论的框架效应预测应用于LLM的风险决策测试~\cite{Payne2025Analysis}。
+其结果表明，前景理论通常能够预测LLM在风险场景中的选择方式，且情境框架对风险偏好的解释力极为显著。军事场景比民用场景产生了大得多的框架效应，揭示了LLM决策对语义情境的高度敏感性。
+
+然而，LLM的概率加工机制与人类认知存在差异。
+Hintze等人系统检验了LLM在概率型经济选择任务中的概率转换模式~\cite{Hintze2025Nonlinear}。
+他们的核心发现是LLM并不总是呈现人类典型的逆S形概率加权模式：部分模型表现出风险寻求行为，部分则表现出近因偏差。
+这一发现引发了对LLM经济建议质量的严肃关切。如果模型对概率的编码方式与人类存在系统性偏差，那么其在金融和医疗等高风险场景中的建议可靠性将值得审视。
+
+Xiao与Wang的研究比较了GPT系列模型与人类参与者在51个场景中的决策差异~\cite{Xiao2025Evaluating}。
+他们发现虽然LLM在金融域中表现出更高的风险寻求倾向，但其选择模式经常与前景理论的预测相反：GPT-3.5表现出反转的框架效应，而GPT-4在各社会情境中均表现为无差别的风险厌恶。
+这一结果表明，模型的版本迭代可能带来风险偏好的剧烈变化。
+
+在更广泛的行为模拟层面，Aher等人提出了图灵实验方法，通过让GPT模型模拟经典经济学和心理学实验的参与者样本，发现近期模型能够复现已有人类实验发现~\cite{Aher2023Using}。
+Horton等人则提出了homo silicus的概念。他们将LLM视为一种隐含的计算人类模型，通过对GPT-3进行改编自经典经济学实验的模拟，验证了LLM作为经济代理人的可行性~\cite{Horton2024Large}。
+Bail在PNAS上系统论述了生成式AI改善调查研究、在线实验和基于代理的建模等社会科学方法的潜力，同时警示了训练数据偏差等挑战~\cite{Bail2024Can}。
+
+在人格与偏差维度，Salecha等人在PNAS Nexus上发表的研究揭示了一个此前未被充分认识的偏差类型——LLM能够推断自己正在被评估，并在人格调查中将分数偏向特质维度的社会期望端，且这种社会期望偏差在更新模型中更为严重~\cite{Salecha2024LLMs}。
+Jiang等人在ICLR上提出了机器人格清单工具，证明可以通过人格提示方法可控地诱导LLM展现特定人格，产生多样化且可验证的行为~\cite{Jiang2023Evaluating}。
+Gupta等人在ICLR上的研究进一步揭示了人格指定如何激活LLM中深层的隐含推理偏差~\cite{Gupta2024Bias}。
+
+上述文献表明，LLM确实具备可测量、非随机的风险决策行为；提示词中的角色设定能够系统性地改变其决策输出；且LLM的行为偏差与人类的偏差既有重叠也有分离。
+这些发现为本实验通过Prompt设定决策角色以检验代理风险偏移效应提供了充分的理论依据。
+
+\subsection{人类替他人决策的风险偏移效应}
+
+替他人决策是行为经济学和实验心理学中一个积累丰厚的独立研究领域。
+其核心问题——当一个人为另一个人做选择时，风险偏好是否发生系统性变化——与本研究的问题结构高度同构，为LLM代理决策研究提供了直接的对照基准。
+
+Polman与Wu的综合性元分析是该领域的纲领性工作~\cite{Polman2020Decision}。
+他们对71篇已发表和未发表论文中的128个效应量进行了系统分析（总计14443个观测值），发现当人们为他人做选择时存在显著但较小的风险寻求偏移效应（Cohen's d = 0.105）。
+然而，元分析同时揭示了研究间方差极大，表明该效应受到多重调节因素的影响，包括选择接受者的身份、决策框架的设定以及决策互惠性的有无。
+这一发现暗示替他人决策的风险偏移是多种心理机制竞争叠加的结果。
+
+在偏移方向这一核心问题上，文献呈现了谨慎偏移与风险寻求偏移的竞争性证据。
+Fullbrunn与Luhan发现替他人决策会降低损失厌恶，从而增加替他人承担的风险~\cite{Fullbrunn2017Decision}。
+然而，同一团队在后续研究中发现，在无奖金制度的条件下，决策者为他人的投资显著低于为自己；而当存在有限责任制度时，为他人的投资则显著高于为自己~\cite{Fullbrunn2019Responsibility}。
+这一发现的关键意义在于：制度框架是风险偏移方向的决定性因素。
+Buckle等人进一步测试了委托人数量和投资金额对责任感的影响，发现人均捐赠金额产生了效应~\cite{Buckle2024Needs}。
+这些发现共同指向了责任分配的具体形式在代理风险决策中的核心地位。
+
+心理机制层面的研究为上述行为模式提供了更微观的解释。
+Stone等人通过多实验设计表明后悔顾虑在为自己和为他人决策时均增加了风险规避~\cite{Stone2002Risk}。
+Stone与Allgaier通过三个实验进一步揭示了一个重要的情境边界：在风险被重视的社会领域中，人们为他人做更冒险的决策；而在风险不被重视的领域则不会~\cite{Stone2008Social}。
+这一发现表明替他人决策的风险偏移主要基于决策者对风险感知社会价值的判断，而非纯粹的认知偏差。
+
+Rigoli等人发现替他人做风险选择时赌博倾向增加但选项价值调谐度降低~\cite{Rigoli2018Risk}，表明代理决策中的信息加工质量可能低于为自己决策。
+Barrafrem与Hausfeld利用眼动追踪技术提供了更为直接的认知过程证据：为自己和为他人的风险偏好无显著差异，但为他人的决策错误率更高、信息处理投入更少~\cite{Barrafrem2020Tracing}。
+Batteux等人发现代理决策中的风险偏好更接近期望值中性，主观风险偏好被削弱~\cite{Batteux2017Risk}；在后续研究中进一步发现即使参与者认为接受者的偏好与自己相似，当为自己承担高风险时也不愿为他人这样做~\cite{Batteux2020Decisions}。
+Michael等人的研究则表明决策者愿意根据社会信息调整风险偏好，但决策结果归属本身不影响风险选择~\cite{Michael2021Decision}。
+
+综观上述文献，人类代理人在替他人决策时的风险偏移呈现出三个显著特征：偏移方向受制于问责压力、损益域框架和有限责任制度等多重因素的复杂交互；代理决策中的认知投入和信息加工深度通常低于为自己决策；心理机制（后悔、责任感知、社会价值判断）的状态是影响偏移方向的关键因素。
+这三个特征构成了本研究对比LLM代理行为的人类对照。
+
+\subsection{大语言模型的金融应用与安全对齐}
+
+LLM在金融领域的应用已从实验室原型迅速走向生产部署，与其风险行为和安全对齐相关的研究随之爆发式增长。
+因此，我们希望探究LLM在金融代理场景中的行为偏差是否受到底层安全对齐机制的隐性塑造。
+
+在金融预测与交易领域，Lopez-Lira与Tang的开创性工作最先揭示了LLM在投资决策中的新兴能力——ChatGPT能够显著预测股票收益~\cite{LopezLira2023Can}。
+Fatouros等人提出的MarketSenseAI框架综合利用GPT-4的链式推理、新闻分析和基本面评估，在S\&P 100上实现了显著超额收益~\cite{Fatouros2024Can}。
+Yu等人的FinMem框架通过分层记忆模块和交易角色设计构建了性能增强的LLM交易代理，强调了角色设定对交易表现的实质性影响~\cite{Yu2023FinMem}。
+
+然而，伴随能力展示而来的是对LLM金融决策偏差的系统性揭示。
+Lee等人发现LLM在投资分析中存在固有偏见：跨模型倾向于偏好科技股、大盘股和反转策略，且这些偏差常升级为确认偏误~\cite{Lee2025Your}。
+Dimino等人首次系统检测了LLM在金融二分决策中的位置偏差，发现该偏差普遍存在、随模型规模变化，且在风险情境中尤为脆弱~\cite{Dimino2025Tracing}。
+这些发现警示我们LLM在金融决策中应当被视作携带系统性偏差的行为主体。
+
+在AI安全与对齐研究的主线上，Ouyang等人发表的InstructGPT工作是RLHF的里程碑，证明了通过人类反馈的强化学习可以将语言模型与用户意图对齐，在提升有用性的同时减少有害输出~\cite{Ouyang2022Training}。
+Bai等人提出的Constitutional AI方法更进一步，通过建立一套行为准则并利用AI自我反馈实现无害化训练，训练出既无害又不回避的AI助手~\cite{Bai2022Constitutional}。
+这两项工作奠定了当前主流LLM安全对齐的技术基础。
+
+然而，安全对齐的稳健性和边界正在受到挑战。
+Qi等人在ICLR上的研究发现即使是少量对抗性微调样本也能破坏LLM的安全对齐，更具警示意义的是仅使用良性数据集进行微调也可能无意中降低安全对齐水平~\cite{Qi2024Finetuning}。
+McIntosh等人的研究揭示了RLHF在面对语义操纵时的结构性局限：RLHF无法完全缓解意识形态条件化提示的影响，且其训练样本的代表性不足以涵盖多元的人类价值观~\cite{McIntosh2024Inadequacy}。
+Liu等人在ACL上的发现表明经过RLHF微调的模型在人格引导生成中更易被操控，且呈现的视角多样性显著降低，尤其体现在对特定政治和性别立场的敏感度上~\cite{Liu2024Evaluating}。
+Wu等人在NAACL上从训练动态的角度分析了指令微调对LLM行为的内在影响，揭示了指令微调如何使模型将预训练知识向用户导向任务进行系统性旋转~\cite{Wu2024Language}。
+
+综上所述，LLM行为偏差的研究已确认了LLM的风险偏好是可测量的且受提示词操纵的；人类替他人决策的研究已建立了代理风险偏移的多因素解释框架；LLM安全对齐的研究已揭示了底层训练机制如何塑造模型的行为边界。
+然而，尚无研究将这三条脉络交叉在一起，系统检验安全对齐机制是否在LLM担任代理角色时被情境性地激活，从而产生有别于人类的、独特的代理风险偏移模式。
+本研究正是旨在填补这一交叉空白。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{实验设计}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{实验对象}
+
+本实验选取五款国内外主流大语言模型作为AI合成被试，以覆盖差异化的技术架构、推理能力和安全对齐策略。
+模型选择遵循三个标准：其一，在中文语境中具有广泛的用户基础或学术关注度；其二，技术架构和对齐策略具有可辨识的差异，以确保模型间异质性假设的可检验性；其三，提供稳定的API访问接口以支持大规模重复实验。
+五款模型的基本信息如\cref{tab:models}所示。
+
+\begin{table}[tb]
+  \caption{实验所用大语言模型的基本信息}
+  \label{tab:models}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{p{0.68in}p{0.52in}p{1.8in}}
+    \toprule
+    模型名称 & 开发方 & 技术特点 \\
+    \midrule
+    DeepSeek-Flash & 深度求索 & 轻量级推理模型，响应速度快 \\
+    DeepSeek-Pro & 深度求索 & 旗舰级推理模型，推理稳定性更强 \\
+    Grok-4 & xAI & 旗舰模型，表现出强期望值计算倾向 \\
+    Kimi-k2 & 月之暗面 & 长上下文与中文任务能力突出 \\
+    GPT-4.1 & OpenAI & 国际头部模型，社会情境敏感性较强 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+每款模型在每个实验条件下独立运行50次重复实验，每次实验为独立API会话，无上下文共享。
+重复实验通过设置各模型默认的Temperature参数引入回答的随机性。
+全部实验条件共6组，主实验总数据量为5（模型）$\times$ 6（条件）$\times$ 50（重复）= 1500组有效观测。
+此外，本研究对DeepSeek-Flash和DeepSeek-Pro额外采集600组深度思考模式对照样本，并设置逐题独立调用的序列效应对照组以评估题目呈现方式的影响。
+
+\subsection{实验场景与任务}
+
+实验场景设定为金融投资决策情境。
+这一场景选择基于两重考量：其一，金融代理是LLM当前最广泛、最高风险的实际应用场景之一；其二，金额刺激便于构造精确的期望值计算和风险中性基准，满足实验设计的内部效度要求。
+
+实验任务采用Holt与Laury的经典风险偏好测量范式~\cite{Holt2002Risk}。
+该范式通过一系列成对彩票选择（Paired Lottery Choice）测量决策者的风险偏好，因其结构简洁、理论基准明确而被广泛应用于实验经济学研究。
+具体而言，被试需要在10道选择题中，每道题在安全选项（选项A）和风险选项（选项B）之间做出选择。
+从第1题至第10题，安全选项的高收益概率从10\%逐步递增至100\%，使得风险中性的决策者应在第4题至第5题之间从选项A切换至选项B。
+转换点越靠后，表明决策者越偏好安全选项，风险规避程度越高。
+
+\Cref{tab:hl_gain}展示了收益域中使用的成对彩票选择量表。
+在损失域中，所有结果通过线性变换转换为损失金额：损失域金额 = 385 $-$ 收益域金额。
+该变换保留了选项A的波动范围（40元）和选项B的波动范围（375元）不变，确保两个域在每一题上的期望值优势差距完全相同，风险中性转折点均落在第4题与第5题之间。
+
+\begin{table*}[tb]
+  \caption{收益域Holt-Laury成对彩票选择量表}
+  \label{tab:hl_gain}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{cccccc}
+    \toprule
+    题号 & 选项A (安全) & 期望值 A & 选项B (风险) & 期望值 B & 期望值差 (A$-$B) \\
+    \midrule
+    1 & 10\%获200元，90\%获160元 & 164.0 & 10\%获385元，90\%获10元 & 37.7 & +126.3 \\
+    2 & 20\%获200元，80\%获160元 & 168.0 & 20\%获385元，80\%获10元 & 84.4 & +83.6 \\
+    3 & 30\%获200元，70\%获160元 & 172.0 & 30\%获385元，70\%获10元 & 131.1 & +40.9 \\
+    4 & 40\%获200元，60\%获160元 & 176.0 & 40\%获385元，60\%获10元 & 177.8 & $-$1.8 \\
+    5 & 50\%获200元，50\%获160元 & 180.0 & 50\%获385元，50\%获10元 & 197.5 & $-$17.5 \\
+    6 & 60\%获200元，40\%获160元 & 184.0 & 60\%获385元，40\%获10元 & 235.0 & $-$51.0 \\
+    7 & 70\%获200元，30\%获160元 & 188.0 & 70\%获385元，30\%获10元 & 272.5 & $-$84.5 \\
+    8 & 80\%获200元，20\%获160元 & 192.0 & 80\%获385元，20\%获10元 & 310.0 & $-$118.0 \\
+    9 & 90\%获200元，10\%获160元 & 196.0 & 90\%获385元，10\%获10元 & 347.5 & $-$151.5 \\
+    10 & 100\%获200元，0\%获160元 & 200.0 & 100\%获385元，0\%获10元 & 385.0 & $-$185.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{实验条件与实验设计}
+
+实验采用2（损益域：收益域 vs.\ 损失域）$\times$ 3（决策角色与问责性：为自己决策 vs.\ 替他人决策且不可观察 vs.\ 替他人决策且可观察）的被试间因子设计，共构成6组实验条件。
+\Cref{tab:design}展示了完整的实验设计矩阵和各条件对应的假设检验目标。
+
+\begin{table*}[tb]
+  \caption{2 $\times$ 3 实验设计矩阵与假设检验目标}
+  \label{tab:design}
+  \centering
+  \begin{tabular}{cccccl}
+    \toprule
+    条件 & 损益域 & 决策角色 & 问责性 & Prompt角色设定 & 核心检验目标 \\
+    \midrule
+    1 & 收益 & 为自己 & 无 & 以第一人称为自己做投资决策 & 基线：LLM自身风险偏好 \\
+    2 & 收益 & 替他人 & 不可观察 & 金融投资经理，委托人不知具体选择 & H1A/H1B：纯粹代理效应 \\
+    3 & 收益 & 替他人 & 可观察 & 金融投资经理，委托人完全观察决策 & H2：问责调节效应（收益域）\\
+    4 & 损失 & 为自己 & 无 & 以第一人称为自己做损失管理决策 & 基线：LLM损失域风险偏好 \\
+    5 & 损失 & 替他人 & 不可观察 & 金融投资经理，委托人不知具体选择 & H1A/H1B：损失域代理效应 \\
+    6 & 损失 & 替他人 & 可观察 & 金融投资经理，委托人完全观察决策 & H2：问责调节效应（损失域）\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+六组条件的提示词设计遵循统一的结构模板：系统角色设定段、任务说明段和输出格式约束段。
+角色设定段在不同条件间变化以操纵决策角色和问责性感知，任务说明段和输出格式约束段保持恒定以确保刺激材料的内部一致性。
+具体而言，条件的系统角色设定以第一人称设定决策收益或损失的归属对象；条件2和条件3设定LLM为专业的金融投资经理，并分别告知委托人不可观察或可观察其决策过程；条件4至条件6在损失域中平行设置对应的角色与问责性组合。
+各条件中的Holt-Laury彩票题目内容完全相同，仅在金额标签的表述上因损益域而存在收益和损失的区别。
+
+\subsection{实验流程}
+
+实验按照以下六个步骤严格执行，以确保数据的可复现性和实验流程的标准化。
+
+\textbf{步骤一：提示词标准化构建。}
+针对6组实验条件分别编写标准化的系统Prompt和用户Prompt。
+系统Prompt明确LLM的决策角色、损益归属和问责性信息；用户Prompt包含10道Holt-Laury彩票选择题，并附带输出格式要求。
+所有Prompt经过预实验验证，确保LLM能够正确理解任务要求并生成可解析的回答格式。
+
+\textbf{步骤二：API调用与数据采集。}
+通过各模型的官方API接口，向每个模型在每个条件下发送独立的会话请求。
+每次API调用为一次独立的无状态会话，不携带前次实验的任何上下文信息。
+要求LLM在每道题的选择前输出其决策理由与思考过程（思维链），最后以标准化的标签格式给出最终选择。
+
+\textbf{步骤三：重复实验。}
+每款模型在每个条件下完成50次独立重复实验。
+Temperature参数采用各模型的默认值（通常在0.7至1.0之间），并将其作为控制变量记录在实验元数据中。
+重复实验的目的在于通过多次采样捕捉LLM在给定Prompt下的回答分布特征，克服单次回答的随机波动。
+
+\textbf{步骤四：序列效应控制。}
+为评估一次会话中连续呈现10道题的序列位置是否对LLM的选择产生系统性影响（例如前序题目中的选项偏好通过上下文传播影响后续选择），设置序列效应对照组。
+在对照组中，10道题以10次独立的API调用分别呈现，每次仅包含一道题，消除题目间的上下文传导路径。
+通过对比连续呈现与独立呈现两种方式下的选择分布，检验序列效应是否存在及其影响量级。
+
+\textbf{步骤五：跨模型重复。}
+依次对DeepSeek-Flash、DeepSeek-Pro、Grok-4、Kimi-k2和GPT-4.1五款模型执行步骤一至步骤四的全部实验流程，确保实验程序的跨模型一致性。
+
+\textbf{步骤六：数据清洗与编码。}
+从API返回的文本中提取结构化的选择数据和思维链文本。
+对于未能按标准格式输出的回答（如使用了非标准标签），由两名编码员独立判断其选择意图，编码员间信度需达到Cohen's $\kappa \geq 0.90$方可纳入正式分析。
+
+\subsection{变量定义与测量}
+
+\textbf{因变量一：安全选择数量（$N_{\text{safe}}$）。}
+定义为每轮实验中决策者在10道题中选择安全选项（选项A）的总题数，取值范围为0至10。
+$N_{\text{safe}}$越高，表明决策者的风险规避程度越强。
+以风险中性决策者为基准，其在收益域和损失域中的$N_{\text{safe}}$均应等于4。
+
+\textbf{因变量二：转换点（Switching Point，$S$）。}
+定义为决策者从选项A切换至选项B的题号位置，取值范围为1至11（$S = 11$表示在所有10道题中始终选择选项A，即极度风险规避）。
+对于存在多次切换（不一致选择）的回答模式，采用两种补充指标：其一，以最后一次切换位置作为有效转换点；其二，记录总切换次数作为回答一致性的辅助度量。
+
+\textbf{因变量三：思维链风险归因。}
+对LLM在每道题选择前输出的思维链文本进行结构化编码，统计其决策理由中提及的关键主题类别，包括期望值计算、对委托人责任的提及、对观察者的考量、对后悔的预期以及对安全性的强调。
+每个类别的提及频次作为分析LLM决策机制的行为痕迹数据。
+
+\textbf{自变量与控制变量。}
+自变量包括损益域（收益/损失）、决策角色（为自己/替他人）和问责性（不可观察/可观察）。
+控制变量包括模型身份（五款模型）、Temperature参数值和实验会话编号。
+
+\subsection{数据分析方法}
+
+数据分析按照从整体到局部、从定量到定性的递进逻辑展开，分为以下五个层次。
+
+\textbf{第一层：描述性统计与可视化。}
+计算各实验条件下每款模型的安全选择数量和转换点的均值、标准差、中位数和四分位距。
+绘制分组箱线图和核密度估计曲线，直观呈现不同条件下LLM风险偏好的分布特征与离群模式。
+
+\textbf{第二层：主效应检验（H1A与H1B的检验）。}
+以安全选择数量$N_{\text{safe}}$为因变量，以决策角色（为自己vs.\ 替他人）为自变量，分别在收益域和损失域中进行组间比较。
+由于$N_{\text{safe}}$为计数型变量且分布形态可能偏离正态，采用Kruskal-Wallis非参数秩和检验作为主分析方法，辅以Mann-Whitney U检验进行成对比较。
+若在收益域的替他人条件下$N_{\text{safe}}$显著高于为自己条件，则H1A（算法谨慎偏移假设）获得支持。
+若在收益域的替他人条件下$N_{\text{safe}}$显著低于为自己条件，则H1B（道德风险偏移假设）获得支持。
+
+\textbf{第三层：问责调节效应检验（H2的检验）。}
+以安全选择数量$N_{\text{safe}}$为因变量，构建以损益域、问责性及二者交互项为预测变量的广义线性模型。
+损益域$\times$问责性交互项的显著性与方向直接检验H2的预测。
+考虑到$N_{\text{safe}}$为有界计数变量（0至10），采用二项回归或Beta回归进行稳健性验证。
+分别在各模型内部进行子组分析，评估调节效应的跨模型一致性。
+
+\textbf{第四层：模型间异质性检验（H3的检验）。}
+以安全选择数量$N_{\text{safe}}$为因变量，以模型身份和实验条件为自变量，进行双向方差分析。
+若方差分析的前提假设（正态性和方差齐性）不满足，则改用Scheirer-Ray-Hare非参数双因素方差分析或Aligned Rank Transform方法。
+事后进行Tukey HSD多重比较，识别异质性的具体来源（哪些模型对之间差异显著）。
+
+\textbf{第五层：思维链文本分析。}
+对LLM输出的思维链文本进行量化内容分析。
+首先基于预定义编码框架（包括期望值计算、委托人责任、观察者意识、后悔预期、安全强调五个类别）进行人工编码，建立编码员间信度。
+其次统计各实验条件下不同主题类别的提及频率和占比，运用卡方检验或Fisher精确检验比较组间差异。
+该分析旨在为行为层面的风险偏移提供认知层面的机制解释，回答LLM在代理角色下究竟是因为考虑了哪些因素而改变了风险偏好。
+
+上述五层分析构成了从行为指标到认知机制、从整体效应到边界条件的完整分析路径。
+所有统计分析在Python 3.x环境下完成，主要依赖scipy、statsmodels和pingouin等科学计算库。
+显著性水平统一设定为$\alpha = 0.05$，多重比较中采用Benjamini-Hochberg假发现率校正。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{实验结果}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{数据说明与样本概况}
+
+本研究主实验通过标准化API调用方式采集数据。
+五款模型在6种实验条件下各执行50次独立调用，产生主实验原始样本共计1500条。
+此外，DeepSeek-Flash和DeepSeek-Pro额外进行了深度思考模式（thinking enabled）对照实验，每个版本增加300条数据，合计600条对照样本。
+因此，最终进入统计分析的原始数据总量为2100条。
+
+数据质量检验包括两个方面。
+第一，全部2100条API返回结果均成功解析为预定义JSON格式，解析错误率为0\%。
+第二，根据Holt和Laury范式的single switching point逻辑，本文计算每组回答中选择方向变化次数，并以切换次数大于3作为剔除标准。
+检验结果显示，所有样本的切换次数均在合理范围内，无需剔除。
+因此，本研究正式分析样本为2100条，其中主实验1500条，DeepSeek深度思考对照实验600条。
+
+\subsection{描述性统计}
+
+\Cref{tab:descriptive}汇总了关闭深度思考模式下五款模型在六种实验条件中的安全选择数描述性统计。
+整体来看，模型之间的基线差异非常明显。
+Grok-4在全部条件下的$N_{\text{safe}}$恒等于4，表现为完全风险中性；
+Kimi-k2在收益域均值达到8.39，在损失域均值达到9.42，呈现极端保守倾向；
+GPT-4.1则表现出强烈的条件敏感性，尤其是在损失域可观察代理条件下，$N_{\text{safe}}$均值升至7.28。
+
+\begin{table*}[tb]
+  \caption{各模型在各实验条件下的安全选择数（$N_{\text{safe}}$）描述性统计}
+  \label{tab:descriptive}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrrrr}
+    \toprule
+    模型 & 条件 & $n$ & 均值 & $SD$ & 中位数 & 最小值 & 最大值 \\
+    \midrule
+    DeepSeek-Flash & Gain/Self & 50 & 3.92 & 2.41 & 5.0 & 0 & 9 \\
+    DeepSeek-Flash & Gain/Agent-Inv & 50 & 4.14 & 2.73 & 5.0 & 0 & 9 \\
+    DeepSeek-Flash & Gain/Agent-Vis & 50 & 4.46 & 2.73 & 5.0 & 0 & 9 \\
+    DeepSeek-Flash & Loss/Self & 50 & 4.18 & 2.22 & 4.0 & 0 & 9 \\
+    DeepSeek-Flash & Loss/Agent-Inv & 50 & 4.86 & 3.20 & 5.0 & 0 & 10 \\
+    DeepSeek-Flash & Loss/Agent-Vis & 50 & 4.58 & 2.37 & 5.0 & 0 & 9 \\
+    DeepSeek-Pro & Gain/Self & 50 & 3.36 & 1.08 & 3.0 & 0 & 5 \\
+    DeepSeek-Pro & Gain/Agent-Inv & 50 & 3.74 & 1.27 & 4.0 & 0 & 9 \\
+    DeepSeek-Pro & Gain/Agent-Vis & 50 & 3.74 & 1.16 & 4.0 & 0 & 6 \\
+    DeepSeek-Pro & Loss/Self & 50 & 4.02 & 1.49 & 4.0 & 0 & 10 \\
+    DeepSeek-Pro & Loss/Agent-Inv & 50 & 4.36 & 1.68 & 4.0 & 0 & 10 \\
+    DeepSeek-Pro & Loss/Agent-Vis & 50 & 3.98 & 1.70 & 4.0 & 0 & 10 \\
+    Grok-4 & 全部条件 & 300 & 4.00 & 0.00 & 4.0 & 4 & 4 \\
+    Kimi-k2 & Gain/Self & 50 & 8.48 & 1.74 & 9.0 & 0 & 9 \\
+    Kimi-k2 & Gain/Agent-Inv & 50 & 8.14 & 2.11 & 9.0 & 0 & 10 \\
+    Kimi-k2 & Gain/Agent-Vis & 50 & 8.56 & 1.36 & 9.0 & 4 & 9 \\
+    Kimi-k2 & Loss/Self & 50 & 9.38 & 1.24 & 10.0 & 5 & 10 \\
+    Kimi-k2 & Loss/Agent-Inv & 50 & 9.50 & 1.04 & 10.0 & 5 & 10 \\
+    Kimi-k2 & Loss/Agent-Vis & 50 & 9.38 & 1.52 & 10.0 & 4 & 10 \\
+    GPT-4.1 & Gain/Self & 50 & 4.92 & 0.27 & 5.0 & 4 & 5 \\
+    GPT-4.1 & Gain/Agent-Inv & 50 & 4.66 & 0.52 & 5.0 & 3 & 5 \\
+    GPT-4.1 & Gain/Agent-Vis & 50 & 5.22 & 0.46 & 5.0 & 5 & 7 \\
+    GPT-4.1 & Loss/Self & 50 & 6.62 & 1.83 & 5.0 & 5 & 9 \\
+    GPT-4.1 & Loss/Agent-Inv & 50 & 5.50 & 1.30 & 5.0 & 4 & 9 \\
+    GPT-4.1 & Loss/Agent-Vis & 50 & 7.28 & 1.78 & 8.0 & 5 & 9 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig01_mean_comparison.tex}
+  \caption{五款模型在六种实验条件下的平均安全选择数。虚线表示风险中性基准$N_{\text{safe}}=4$。}
+  \label{fig:mean_comparison}
+\end{figure}
+
+\Cref{fig:mean_comparison}直观展示了上述差异。
+Grok-4的均值始终精确落在风险中性线上；
+Kimi-k2整体远高于风险中性基准；
+GPT-4.1在不同条件间波动明显，说明其风险偏好会随角色、问责性和损益框架发生系统变化。
+
+\subsection{代理角色主效应检验}
+
+为检验H1A与H1B，本文将Self条件与Agent条件（合并不可观察和可观察）进行Mann-Whitney U检验。
+\Cref{tab:agent_effect}展示了检验结果。
+
+\begin{table}[tb]
+  \caption{代理角色主效应检验结果}
+  \label{tab:agent_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    模型 & Self均值 & Agent均值 & $U$ & $p$ \\
+    \midrule
+    DeepSeek-Flash & 4.05 & 4.51 & 8911.0 & 0.115 \\
+    DeepSeek-Pro & 3.69 & 3.96 & 8222.0 & 0.007 \\
+    Grok-4 & 4.00 & 4.00 & -- & 1.000 \\
+    Kimi-k2 & 8.93 & 8.89 & 9893.5 & 0.867 \\
+    GPT-4.1 & 5.77 & 5.67 & 10219.0 & 0.711 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+结果显示，代理角色的主效应仅在DeepSeek-Pro上达到统计显著水平（$p=0.007$）。
+DeepSeek-Pro在替他人决策时平均安全选择数从3.69升至3.96，支持H1A的算法谨慎偏移假设。
+DeepSeek-Flash虽呈现同方向趋势，但由于输出方差较大，未达到统计显著性。
+Grok-4完全不受角色设定影响，Kimi-k2由于基线极度保守而接近天花板，GPT-4.1则在不同问责条件之间出现方向相反的变化，使得合并后的代理主效应不显著。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig02_deepseek_pro_mean.tex}
+  \caption{DeepSeek-Pro在关闭深度思考模式下的各条件均值对比。}
+  \label{fig:deepseek_pro_mean}
+\end{figure}
+
+\Cref{fig:deepseek_pro_mean}显示，DeepSeek-Pro在收益域代理条件下的安全选择数高于为自己决策条件，损失域中也呈现围绕风险中性点的小幅波动。
+这一图形结果与代理角色主效应检验相互印证。
+
+\subsection{损益域框架效应}
+
+进一步比较收益域与损失域可发现，多数模型并未复现人类前景理论中损失域风险寻求的经典反射效应。
+\Cref{tab:domain_effect}显示，DeepSeek-Pro、Kimi-k2和GPT-4.1在损失域中的$N_{\text{safe}}$显著高于收益域，说明模型在遇到“损失”语义时反而更趋向风险规避。
+
+\begin{table}[tb]
+  \caption{损益域框架效应检验结果}
+  \label{tab:domain_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    模型 & 收益域 & 损失域 & $U$ & $p$ \\
+    \midrule
+    DeepSeek-Flash & 4.17 & 4.54 & 10755.0 & 0.499 \\
+    DeepSeek-Pro & 3.61 & 4.12 & 8936.5 & 0.001 \\
+    Grok-4 & 4.00 & 4.00 & -- & 1.000 \\
+    Kimi-k2 & 8.39 & 9.42 & 3794.5 & $<0.001$ \\
+    GPT-4.1 & 4.93 & 6.47 & 5927.0 & $<0.001$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+这一“反前景理论”现象提示，安全对齐训练可能使模型对“损失”“亏损”等负面语义信号产生过度规避反应。
+换言之，模型并非简单复制人类在损失域中赌一把的倾向，而是在风险提示语境中激活更强的保守策略。
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig03_gpt41_distribution.tex}
+    \subcaption{GPT-4.1各条件下$N_{\text{safe}}$分布。}
+    \label{fig:gpt_distribution}
+  \end{minipage}
+  \vspace{0.3em}
+
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig03_kimi_distribution.tex}
+    \subcaption{Kimi-k2各条件下$N_{\text{safe}}$分布。}
+    \label{fig:kimi_distribution}
+  \end{minipage}
+  \caption{GPT-4.1与Kimi-k2在六种实验条件下的安全选择数分布直方图。}
+  \label{fig:domain_distributions}
+\end{figure}
+
+\Cref{fig:domain_distributions}进一步显示，GPT-4.1在收益域的分布集中于4至5附近，而在损失域尤其是Loss/Agent-Vis条件下明显向高风险规避区间移动。
+Kimi-k2则在多数条件下集中于9至10，显示出更强的天花板效应。
+
+\subsection{问责性调节效应}
+
+H2关注问责性是否调节代理角色下的风险偏好。
+本文使用Kruskal-Wallis检验比较Self、Agent-Invisible和Agent-Visible三组。
+结果如\Cref{tab:accountability_effect}所示。
+
+\begin{table}[tb]
+  \caption{问责性调节效应检验结果}
+  \label{tab:accountability_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    模型 & Self & Inv & Vis & $H$ & $p$ \\
+    \midrule
+    DeepSeek-Flash & 4.05 & 4.50 & 4.52 & 2.57 & 0.277 \\
+    DeepSeek-Pro & 3.69 & 4.05 & 3.86 & 7.25 & 0.027 \\
+    Grok-4 & 4.00 & 4.00 & 4.00 & 0.00 & 1.000 \\
+    Kimi-k2 & 8.93 & 8.82 & 8.97 & 0.60 & 0.743 \\
+    GPT-4.1 & 5.77 & 5.08 & 6.25 & 45.73 & $<0.001$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+GPT-4.1的问责性效应最为突出（$H=45.73,p<0.001$）。
+当GPT-4.1为自己决策时，平均$N_{\text{safe}}$为5.77；
+替他人决策但不可观察时，该值下降至5.08，表现出类似道德风险的风险放松；
+替他人决策且可观察时，该值上升至6.25，说明可观察性显著强化了保守选择。
+这种模式在损失域中进一步放大：Loss/Self为6.62，Loss/Agent-Inv为5.50，而Loss/Agent-Vis达到7.28。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig04_gpt41_interaction.tex}
+  \caption{GPT-4.1中损益域与问责性的交互作用。}
+  \label{fig:gpt_interaction}
+\end{figure}
+
+\Cref{fig:gpt_interaction}显示，问责压力与损失框架叠加时，GPT-4.1产生最强的保守偏移。
+这一结果为H2提供了强有力支持，同时也说明LLM代理偏差并非单一方向，而是取决于角色、可见性和损益语义的组合。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig05_gpt41_risk_classification.tex}
+  \caption{GPT-4.1在不同实验条件下的风险分类堆叠条形图。}
+  \label{fig:gpt_risk_classification}
+\end{figure}
+
+\Cref{fig:gpt_risk_classification}从分类层面展示了同一模式。
+在Loss/Agent-Vis条件下，“非常风险厌恶”和“极度风险厌恶”类别占比明显扩大；相比之下，Loss/Agent-Inv条件保留了更多风险中性或轻度风险厌恶回答。
+
+\subsection{模型间异质性}
+
+H3预测不同架构和对齐策略的模型在代理风险偏好上存在显著差异。
+跨五款模型的Kruskal-Wallis检验结果显示，模型间差异极其显著（$H=857.09,p=3.30\times10^{-184}$）。
+基于描述性统计与分布形态，本研究将模型归纳为三种行为原型。
+
+\textbf{第一类是绝对理性型，以Grok-4为代表。}
+Grok-4在全部300次主实验观测中$N_{\text{safe}}$均为4，完全遵循风险中性的期望值最大化策略。
+这说明其输出几乎不受角色设定和损益框架影响，但也意味着它缺乏对委托人风险偏好和社会情境的适配。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig06_grok_distribution.tex}
+  \caption{Grok-4各条件下的$N_{\text{safe}}$分布。}
+  \label{fig:grok_distribution}
+\end{figure}
+
+\Cref{fig:grok_distribution}显示，Grok-4在全部条件下均坍缩于$N_{\text{safe}}=4$，几乎完全消除了随机波动和情境诱导。
+
+\textbf{第二类是极度保守型，以Kimi-k2为代表。}
+Kimi-k2在收益域和损失域均表现出高安全选择数，且损失域均值接近10，呈现明显天花板效应。
+这类模型可能在安全对齐过程中形成了过强的风险规避倾向，使得实验操纵难以进一步改变其选择。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig07_kimi_mean.tex}
+  \caption{Kimi-k2各条件均值对比。}
+  \label{fig:kimi_mean}
+\end{figure}
+
+\Cref{fig:kimi_mean}表明，Kimi-k2不仅整体远高于风险中性基准，而且在损失域中进一步逼近量表上限。
+
+\textbf{第三类是情境敏感型，以GPT-4.1和DeepSeek系列为代表。}
+GPT-4.1对问责性和损失框架反应最强，DeepSeek-Pro则表现出显著但幅度较小的代理谨慎偏移。
+DeepSeek-Flash的条件均值接近风险中性，但分布更分散，提示轻量模型在复杂社会决策任务中的输出稳定性较弱。
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig08_deepseek_pro_risk_classification.tex}
+    \subcaption{DeepSeek-Pro风险分类图。}
+    \label{fig:deepseek_pro_risk_classification}
+  \end{minipage}
+  \vspace{0.3em}
+
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig08_deepseek_flash_distribution_disabled.tex}
+    \subcaption{DeepSeek-Flash关闭深度思考时的分布。}
+    \label{fig:deepseek_flash_distribution_disabled}
+  \end{minipage}
+  \caption{DeepSeek系列模型在关闭深度思考模式下的风险分类与分布特征。}
+  \label{fig:deepseek_disabled_patterns}
+\end{figure}
+
+\Cref{fig:deepseek_disabled_patterns}显示，DeepSeek-Pro整体接近风险中性但仍保留框架敏感性；DeepSeek-Flash的分布更宽，在部分条件下出现更明显的离散和双峰特征。
+
+\subsection{附加发现：深度思考模式与双系统效应}
+
+DeepSeek的深度思考模式带来了本研究最重要的附加发现。
+如\Cref{tab:thinking_effect}所示，开启深度思考后，DeepSeek-Flash和DeepSeek-Pro的$N_{\text{safe}}$均显著向风险中性点4收敛。
+
+\begin{table}[tb]
+  \caption{DeepSeek深度思考模式对比检验}
+  \label{tab:thinking_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    模型 & Disabled & Enabled & $U$ & $p$ \\
+    \midrule
+    DeepSeek-Flash & 4.36 & 4.01 & 33001.5 & $<0.001$ \\
+    DeepSeek-Pro & 3.87 & 4.03 & 49779.0 & 0.004 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig09_deepseek_thinking.tex}
+  \caption{DeepSeek系列模型在关闭与开启深度思考模式下的安全选择数对比。}
+  \label{fig:deepseek_thinking}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig10_deepseek_flash_distribution_disabled.tex}
+    \subcaption{关闭深度思考：分散的直觉模式。}
+    \label{fig:deepseek_flash_disabled_repeat}
+  \end{minipage}
+  \vspace{0.3em}
+
+  \begin{minipage}{0.98\linewidth}
+    \centering
+    \input{figs/tikz/fig10_deepseek_flash_distribution_enabled.tex}
+    \subcaption{开启深度思考：收敛的理性模式。}
+    \label{fig:deepseek_flash_enabled}
+  \end{minipage}
+  \caption{DeepSeek-Flash关闭与开启深度思考模式时的$N_{\text{safe}}$分布对比。}
+  \label{fig:deepseek_flash_thinking_distributions}
+\end{figure}
+
+这一结果可被理解为双过程认知理论在LLM行为中的算法映射。
+关闭深度思考时，模型更容易受“替客户决策”“选择会被审视”等社会性语言线索影响；
+开启深度思考时，模型更倾向于逐题计算期望值，并严格选择期望值更高的选项。
+因此，显式推理能够显著抑制风险偏好偏差，但同时也会削弱模型对社会情境的敏感性。
+\Cref{fig:deepseek_flash_thinking_distributions}进一步显示，DeepSeek-Flash由关闭深度思考时的高方差分布，转向开启深度思考后的风险中性集中分布。
+
+\subsection{决策理由文本分析}
+
+为进一步解释行为结果，本研究对模型输出的决策理由进行关键词词频分析。
+词典包括三类主题：期望值与计算、客户与问责、风险与损失。
+\Cref{fig:text_analysis}显示，模型在为自己决策时主要关注期望值计算；进入代理情境后，“委托人”“责任”“解释”“担责”等客户与问责类词汇显著增加；在损失域中，“风险”“安全”“保守”“损失”等词汇的提及率进一步升高。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig11_text_analysis.tex}
+  \caption{不同决策角色下的LLM认知焦点转移。}
+  \label{fig:text_analysis}
+\end{figure}
+
+分模型文本分析进一步印证了三种行为原型。
+如\Cref{fig:text_models}所示，Grok-4更持续地关注期望值计算；
+Kimi-k2对风险与损失词汇的提及率长期处于高位；
+GPT-4.1在代理可观察条件下显著增加客户与问责类词汇。
+这说明模型的外显选择差异与其决策理由中的注意力焦点具有一致性。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig12_text_models.tex}
+  \caption{不同行为原型模型的决策理由特征差异。}
+  \label{fig:text_models}
+\end{figure}
+
+\subsection{稳健性检验：序列效应}
+
+为控制自回归机制可能导致的序列效应，本文设置逐题独立调用对照组，将10道题拆分为10次独立API调用。
+结果显示，序列效应确实会影响部分模型的$N_{\text{safe}}$绝对水平，但不改变主实验中的核心相对判断。
+\Cref{fig:sequence_all_models,fig:sequence_heatmap}展示了逐题独立调用与整卷作答之间的整体对比和差异热力图。
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig13_sequence_all_models.tex}
+  \caption{全模型序列效应对比（整卷作答 vs.\ 逐题独立）。}
+  \label{fig:sequence_all_models}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \input{figs/tikz/fig14_sequence_delta_heatmap.tex}
+  \caption{序列效应Delta热力图（逐题独立调用减整卷作答）。}
+  \label{fig:sequence_heatmap}
+\end{figure}
+
+具体而言，DeepSeek-Pro和Grok-4呈现显著正向序列效应，逐题独立调用时更保守；
+Kimi-k2由于已处于极度保守天花板，序列效应整体有限；
+GPT-4.1则表现出方向性不对称，在收益域逐题独立时更保守，在损失域逐题独立时更冒险。
+尽管如此，绝对理性型、极度保守型和情境敏感型三种模型原型在逐题独立模式下仍然成立，因此主实验结论具有实质性稳健性。
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{结论与讨论}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{主要发现}
+
+本研究得到以下主要结论。
+
+第一，H1A（算法谨慎偏移）获得部分支持。
+代理角色在DeepSeek-Pro上引发显著谨慎偏移（$p=0.007$），但该效应并非所有模型普遍存在。
+这说明LLM代理偏移具有显著模型特异性。
+
+第二，H1B（道德风险偏移）未获得普遍支持，但在GPT-4.1的不可观察代理条件下出现局部证据。
+GPT-4.1在Agent-Invisible条件下的平均$N_{\text{safe}}$低于Self条件，说明当模型意识到具体选择不会被委托人观察时，可能产生风险放松。
+
+第三，H2（问责性调节）在GPT-4.1上获得强烈支持。
+不可观察条件下的风险放松与可观察条件下的保守加剧形成清晰对比，且该效应在损失域中被显著放大。
+
+第四，H3（模型间异质性）获得强烈支持。
+五款模型从Grok-4的绝对风险中性，到Kimi-k2的极端保守，再到GPT-4.1的情境敏感，构成了差异鲜明的风险偏好谱系。
+
+第五，深度思考模式会使DeepSeek系列模型显著回归风险中性，说明LLM风险偏差并非不可改变的固定属性，而会受到显式推理机制的系统调节。
+
+\subsection{理论意义}
+
+本研究首先将代理决策理论拓展至非人类智能体。
+既有委托-代理和替他人决策研究多以人类被试为对象，而本文证明LLM在被赋予代理角色时同样会产生可测量的风险偏好偏移，并且该偏移受到模型身份和问责机制调节。
+
+其次，本研究揭示了LLM中的双过程式行为机制。
+关闭深度思考时，模型更接近受语义框架影响的直觉反应；开启深度思考时，模型更接近期望值计算驱动的审慎推理。
+这为理解LLM行为偏差的来源提供了新的解释路径。
+
+最后，本研究发现多数模型在损失域中表现出更强风险规避，而非人类前景理论所预测的风险寻求。
+这一反前景理论现象提示，安全对齐训练可能引入了对负面语义的损失放大偏差，从而覆盖模型从训练语料中习得的人类风险偏好模式。
+
+\subsection{实践意义}
+
+本研究对AI金融代理的部署与监管具有四点启示。
+第一，不能假定AI天然风险中性，不同模型具有差异巨大的风险偏好“出厂设定”。
+第二，问责机制设计至关重要，透明审计和可观察性可能显著改变AI代理人的风险选择。
+第三，推理深度是调控风险偏差的重要旋钮，深度思考能够抑制偏差，但也可能削弱模型对社会情境的适配。
+第四，LLM评估基准应纳入行为经济学量表，将风险偏好、代理偏差和问责敏感性作为AI安全评估的重要维度。
+
+\subsection{研究局限与未来方向}
+
+本研究仍存在若干不足。
+第一，Holt-Laury量表虽然是测量风险偏好的经典工具，但虚拟彩票情境与真实金融决策仍有距离。
+未来可以引入资产配置、投资组合或保险购买等更贴近现实的任务。
+第二，本文测试的模型数量有限，随着大模型快速迭代，未来应持续追踪新模型并建立动态AI风险偏好图谱。
+第三，本实验采用各模型默认Temperature参数，未来可以系统操纵Temperature以检验输出随机性对风险偏好的影响。
+第四，本文未设置人类被试对照组，后续研究可以直接比较LLM与人类在代理决策偏差上的差异。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{附录}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{附录A：实验使用的Holt-Laury量表。}
+收益域和损失域的10道配对彩票题目详见实验材料与问题手册。
+
+\textbf{附录B：实验条件的完整提示词。}
+六组条件提示词分别为gain\_self、gain\_agent\_invisible、gain\_agent\_visible、loss\_self、loss\_agent\_invisible和loss\_agent\_visible，系统提示词另存于system文件。
+
+\textbf{附录C：分析代码与数据文件。}
+统计分析脚本、图表和中间数据文件保存在分析目录下，包括数据清洗、统计检验、序列效应分析和文本分析等脚本与结果文件。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{abbrv-doi-hyperref}
+\bibliography{report}
+
+\end{document}

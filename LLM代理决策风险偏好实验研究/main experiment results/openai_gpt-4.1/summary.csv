@@ -1,0 +1,7 @@
+model,thinking,condition,n,mean_n_safe,std_n_safe,median,min,max,sem
+openai:gpt-4.1,disabled,gain_agent_invisible,50,4.660,0.519,5.000,3,5,0.073
+openai:gpt-4.1,disabled,gain_agent_visible,50,5.220,0.465,5.000,5,7,0.066
+openai:gpt-4.1,disabled,gain_self,50,4.920,0.274,5.000,4,5,0.039
+openai:gpt-4.1,disabled,loss_agent_invisible,50,5.500,1.298,5.000,4,9,0.184
+openai:gpt-4.1,disabled,loss_agent_visible,50,7.280,1.785,8.000,5,9,0.252
+openai:gpt-4.1,disabled,loss_self,50,6.620,1.828,5.000,5,9,0.259

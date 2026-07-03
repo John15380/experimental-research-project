@@ -1,0 +1,7 @@
+model,thinking,condition,n,mean_n_safe,std_n_safe,median,min,max,sem
+grok:grok-4,disabled,gain_agent_invisible,50,4.000,0.000,4.000,4,4,0.000
+grok:grok-4,disabled,gain_agent_visible,50,4.000,0.000,4.000,4,4,0.000
+grok:grok-4,disabled,gain_self,50,4.000,0.000,4.000,4,4,0.000
+grok:grok-4,disabled,loss_agent_invisible,50,4.000,0.000,4.000,4,4,0.000
+grok:grok-4,disabled,loss_agent_visible,50,4.000,0.000,4.000,4,4,0.000
+grok:grok-4,disabled,loss_self,50,4.000,0.000,4.000,4,4,0.000

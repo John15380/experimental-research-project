@@ -1,0 +1,46 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=2 by 1, horizontal sep=0.62cm},
+  width=0.44\linewidth,
+  height=0.18\textheight,
+  ymin=0,
+  ymax=105,
+  tick label style={font=\tiny},
+  label style={font=\scriptsize},
+  title style={font=\scriptsize},
+  ymajorgrids=true,
+  grid style={gridgray},
+]
+\nextgroupplot[title={Gain}, symbolic x coords={Self,Inv,Vis}, xtick=data, ylabel={mention rate (\%)},]
+\addplot[ybar, bar width=4pt, fill=dsflash, draw=none] coordinates {(Self,74.393) (Inv,75.154) (Vis,71.446)};
+\addplot[ybar, bar width=4pt, fill=dspro, draw=none] coordinates {(Self,2.527) (Inv,14.357) (Vis,10.009)};
+\addplot[ybar, bar width=4pt, fill=grokc, draw=none] coordinates {(Self,54.577) (Inv,54.157) (Vis,52.481)};
+\nextgroupplot[title={Loss}, symbolic x coords={Self,Inv,Vis}, xtick=data, ]
+\addplot[ybar, bar width=4pt, fill=dsflash, draw=none] coordinates {(Self,47.804) (Inv,49.629) (Vis,49.904)};
+\addplot[ybar, bar width=4pt, fill=dspro, draw=none] coordinates {(Self,2.350) (Inv,16.968) (Vis,14.371)};
+\addplot[ybar, bar width=4pt, fill=grokc, draw=none] coordinates {(Self,79.490) (Inv,79.468) (Vis,78.591)};
+\end{groupplot}
+\node[anchor=north, font=\tiny] at ($(group c1r1.south)!0.5!(group c2r1.south)+(0,-0.20)$)
+  {\tikz\fill[dsflash] (0,0) rectangle (0.16,0.08); EV/math \quad
+    \tikz\fill[dspro] (0,0) rectangle (0.16,0.08); client/resp. \quad
+    \tikz\fill[grokc] (0,0) rectangle (0.16,0.08); risk/loss};
+\end{tikzpicture}

@@ -1,0 +1,50 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=3 by 1, horizontal sep=0.72cm},
+  width=0.31\linewidth,
+  height=0.19\textheight,
+  ymin=0,
+  ymax=105,
+  tick label style={font=\tiny},
+  label style={font=\tiny},
+  title style={font=\tiny},
+  ymajorgrids=true,
+  grid style={gridgray},
+]
+\nextgroupplot[title={Grok-4}, symbolic x coords={Self,Inv,Vis}, xtick=data, ylabel={mention rate (\%)},]
+\addplot[ybar, bar width=3.2pt, fill=dsflash, draw=none] coordinates {(Self,29.881) (Inv,37.435) (Vis,18.958)};
+\addplot[ybar, bar width=3.2pt, fill=dspro, draw=none] coordinates {(Self,0.000) (Inv,0.000) (Vis,0.000)};
+\addplot[ybar, bar width=3.2pt, fill=grokc, draw=none] coordinates {(Self,0.000) (Inv,0.000) (Vis,0.000)};
+\nextgroupplot[title={Kimi-k2}, symbolic x coords={Self,Inv,Vis}, xtick=data, ]
+\addplot[ybar, bar width=3.2pt, fill=dsflash, draw=none] coordinates {(Self,41.560) (Inv,31.907) (Vis,43.493)};
+\addplot[ybar, bar width=3.2pt, fill=dspro, draw=none] coordinates {(Self,0.495) (Inv,1.678) (Vis,1.294)};
+\addplot[ybar, bar width=3.2pt, fill=grokc, draw=none] coordinates {(Self,85.788) (Inv,87.760) (Vis,88.188)};
+\nextgroupplot[title={GPT-4.1}, symbolic x coords={Self,Inv,Vis}, xtick=data, ]
+\addplot[ybar, bar width=3.2pt, fill=dsflash, draw=none] coordinates {(Self,76.250) (Inv,80.110) (Vis,73.072)};
+\addplot[ybar, bar width=3.2pt, fill=dspro, draw=none] coordinates {(Self,8.977) (Inv,26.761) (Vis,50.951)};
+\addplot[ybar, bar width=3.2pt, fill=grokc, draw=none] coordinates {(Self,87.069) (Inv,88.910) (Vis,89.907)};
+\end{groupplot}
+\node[anchor=north, font=\tiny] at ($(group c1r1.south)!0.5!(group c3r1.south)+(0,-0.18)$)
+  {\tikz\fill[dsflash] (0,0) rectangle (0.16,0.08); EV/math \quad
+    \tikz\fill[dspro] (0,0) rectangle (0.16,0.08); client/resp. \quad
+    \tikz\fill[grokc] (0,0) rectangle (0.16,0.08); risk/loss};
+\end{tikzpicture}

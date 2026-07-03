@@ -1,0 +1,21 @@
+\begin{table}[tb]
+  \caption{问责可见性与损益域的差中差检验（Agent条件内置换检验）}
+  \label{tab:domain_accountability_interaction}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    模型 & $\Delta^{Gain}_{Vis-Inv}$ & $\Delta^{Loss}_{Vis-Inv}$ & DiD & $p$ & $q_{BH}$ \\
+    \midrule
+    DeepSeek-V4-Flash & +0.32 & -0.28 & -0.60 & 0.458 & 0.573 \\
+    DeepSeek-V4-Pro & +0.00 & -0.38 & -0.38 & 0.399 & 0.573 \\
+    Grok-4 & +0.00 & +0.00 & +0.00 & 1.000 & 1.000 \\
+    Kimi-k2 & +0.42 & -0.12 & -0.54 & 0.266 & 0.573 \\
+    GPT-4.1 & +0.56 & +1.78 & +1.22 & 0.005 & \textbf{0.025} \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.25em}
+
+  \parbox{0.96\linewidth}{\footnotesize 注：DiD=$\Delta^{Loss}_{Vis-Inv}-\Delta^{Gain}_{Vis-Inv}$。正值表示可见性带来的谨慎化在损失域更强。检验仅使用Agent-Invisible与Agent-Visible条件，置换检验迭代20,000次；$q_{BH}$为本表5个模型检验的Benjamini-Hochberg校正值。}
+\end{table}

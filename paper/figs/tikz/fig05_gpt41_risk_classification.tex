@@ -1,0 +1,48 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=0.17\textheight,
+  xbar stacked,
+  xmin=0,
+  xmax=1,
+  symbolic y coords={G/Self,G/Inv,G/Vis,L/Self,L/Inv,L/Vis},
+  ytick=data,
+  yticklabel style={font=\tiny},
+  xticklabel style={font=\tiny},
+  xlabel={proportion},
+  label style={font=\scriptsize},
+  title style={font=\scriptsize},
+  clip=false,
+  legend style={font=\tiny, draw=none, fill=none, at={(0.5,-0.32)}, anchor=north, legend columns=5, /tikz/every even column/.append style={column sep=0.45em}},
+]
+\addplot[xbar, fill=riskred, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.000,G/Vis) (0.000,L/Self) (0.000,L/Inv) (0.000,L/Vis)};
+\addplot[xbar, fill=riskorange, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.000,G/Vis) (0.000,L/Self) (0.000,L/Inv) (0.000,L/Vis)};
+\addplot[xbar, fill=riskorangeone, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.000,G/Vis) (0.000,L/Self) (0.000,L/Inv) (0.000,L/Vis)};
+\addplot[xbar, fill=riskyellow, draw=white] coordinates {(0.000,G/Self) (0.020,G/Inv) (0.000,G/Vis) (0.000,L/Self) (0.000,L/Inv) (0.000,L/Vis)};
+\addplot[xbar, fill=riskneutral, draw=white] coordinates {(0.080,G/Self) (0.300,G/Inv) (0.000,G/Vis) (0.000,L/Self) (0.020,L/Inv) (0.000,L/Vis)};
+\addplot[xbar, fill=riskgreenone, draw=white] coordinates {(0.920,G/Self) (0.680,G/Inv) (0.800,G/Vis) (0.520,L/Self) (0.820,L/Inv) (0.300,L/Vis)};
+\addplot[xbar, fill=riskgreentwo, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.180,G/Vis) (0.040,L/Self) (0.020,L/Inv) (0.100,L/Vis)};
+\addplot[xbar, fill=riskgreenthree, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.020,G/Vis) (0.140,L/Self) (0.040,L/Inv) (0.140,L/Vis)};
+\addplot[xbar, fill=riskgreenfour, draw=white] coordinates {(0.000,G/Self) (0.000,G/Inv) (0.000,G/Vis) (0.300,L/Self) (0.100,L/Inv) (0.460,L/Vis)};
+\legend{H seek,V seek,seek,S seek,neutral,S averse,averse,V averse,H averse}
+\end{axis}
+\end{tikzpicture}

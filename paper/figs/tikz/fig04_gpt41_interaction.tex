@@ -1,0 +1,40 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=0.27\textheight,
+  tick label style={font=\tiny},
+  label style={font=\scriptsize},
+  legend style={font=\tiny, draw=none, fill=none},
+  ymajorgrids=true,
+  grid style={gridgray},
+  ymin=0,
+  ymax=10.5,
+  ylabel={$N_{\mathrm{safe}}$},
+  height=0.215\textheight, symbolic x coords={Gain,Loss}, xtick=data, legend pos=north west, xlabel={domain},
+]
+\addplot+[mark=*, thick, gptc] coordinates {(Gain,4.920) (Loss,6.620)};
+\addplot+[mark=*, thick, dsflash] coordinates {(Gain,4.660) (Loss,5.500)};
+\addplot+[mark=*, thick, grokc] coordinates {(Gain,5.220) (Loss,7.280)};
+\addplot+[black, dashed, sharp plot, forget plot] coordinates {(Gain,4) (Loss,4)};
+\legend{Self,Invisible,Visible}
+\end{axis}
+\end{tikzpicture}

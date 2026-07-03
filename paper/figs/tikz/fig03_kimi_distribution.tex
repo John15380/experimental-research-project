@@ -1,0 +1,112 @@
+\tikzset{
+  every picture/.style={font=\scriptsize},
+}
+\definecolor{dsflash}{HTML}{4E79A7}
+\definecolor{dspro}{HTML}{F28E2B}
+\definecolor{grokc}{HTML}{59A14F}
+\definecolor{kimic}{HTML}{E15759}
+\definecolor{gptc}{HTML}{B07AA1}
+\definecolor{gridgray}{HTML}{D9D9D9}
+\definecolor{riskred}{HTML}{B2182B}
+\definecolor{riskorange}{HTML}{EF8A62}
+\definecolor{riskorangeone}{HTML}{FDAE61}
+\definecolor{riskyellow}{HTML}{FDDC8B}
+\definecolor{riskneutral}{HTML}{FFFFBF}
+\definecolor{riskgreenone}{HTML}{D9EF8B}
+\definecolor{riskgreentwo}{HTML}{A6D96A}
+\definecolor{riskgreenthree}{HTML}{66BD63}
+\definecolor{riskgreenfour}{HTML}{1A9850}
+
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group name=g, group size=3 by 2, horizontal sep=0.48cm, vertical sep=0.62cm},
+  width=0.33\linewidth,
+  height=0.36\textheight/2.35,
+  tick label style={font=\tiny},
+  label style={font=\tiny},
+  title style={font=\tiny},
+  ymajorgrids=true,
+  grid style={gridgray},
+]
+\nextgroupplot[
+  title={G/Self},
+  ymin=0,
+  ymax=53.1,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xticklabels={},
+  ylabel={freq},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,1.000) (1,0.000) (2,0.000) (3,1.000) (4,1.000) (5,1.000) (6,0.000) (7,1.000) (8,0.000) (9,45.000) (10,0.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(8.48,0) (8.48,47.2)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=8.48};
+\nextgroupplot[
+  title={G/Inv},
+  ymin=0,
+  ymax=46.0,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xticklabels={},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,2.000) (1,0.000) (2,0.000) (3,0.000) (4,0.000) (5,4.000) (6,3.000) (7,0.000) (8,1.000) (9,39.000) (10,1.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(8.14,0) (8.14,41.0)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=8.14};
+\nextgroupplot[
+  title={G/Vis},
+  ymin=0,
+  ymax=53.1,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xticklabels={},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,0.000) (1,0.000) (2,0.000) (3,0.000) (4,3.000) (5,1.000) (6,1.000) (7,0.000) (8,0.000) (9,45.000) (10,0.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(8.56,0) (8.56,47.2)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=8.56};
+\nextgroupplot[
+  title={L/Self},
+  ymin=0,
+  ymax=41.3,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xlabel={$N_{\mathrm{safe}}$},
+  ylabel={freq},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,0.000) (1,0.000) (2,0.000) (3,0.000) (4,0.000) (5,1.000) (6,3.000) (7,1.000) (8,1.000) (9,9.000) (10,35.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(9.38,0) (9.38,36.8)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=9.38};
+\nextgroupplot[
+  title={L/Inv},
+  ymin=0,
+  ymax=38.9,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xlabel={$N_{\mathrm{safe}}$},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,0.000) (1,0.000) (2,0.000) (3,0.000) (4,0.000) (5,2.000) (6,0.000) (7,0.000) (8,0.000) (9,15.000) (10,33.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(9.50,0) (9.50,34.6)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=9.50};
+\nextgroupplot[
+  title={L/Vis},
+  ymin=0,
+  ymax=46.0,
+  xmin=-0.5,
+  xmax=10.5,
+  xtick={0,2,4,6,8,10},
+  yticklabel style={font=\tiny},
+  xlabel={$N_{\mathrm{safe}}$},
+]
+\addplot[ybar, bar width=4.6pt, fill=kimic, draw=none] coordinates {(0,0.000) (1,0.000) (2,0.000) (3,0.000) (4,1.000) (5,3.000) (6,1.000) (7,0.000) (8,0.000) (9,6.000) (10,39.000)};
+\addplot[red, dashed, thick, forget plot] coordinates {(9.38,0) (9.38,41.0)};
+\node[anchor=north east, font=\tiny, fill=white, fill opacity=0.78, text opacity=1, inner sep=1pt] at (rel axis cs:0.98,0.98) {Mean=9.38};
+\end{groupplot}
+\end{tikzpicture}

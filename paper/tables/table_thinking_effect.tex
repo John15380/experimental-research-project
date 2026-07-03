@@ -1,0 +1,16 @@
+\begin{table}[tb]
+  \caption{DeepSeek V4深度思考模式对比检验}
+  \label{tab:thinking_effect}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    模型 & Disabled均值 & Enabled均值 & $\Delta$ & $U$ & $p$ & $q_{BH}$ \\
+    \midrule
+    DeepSeek-V4-Flash & 4.36 & 4.01 & -0.35 & 33001.5 & \textbf{$<0.001$} & \textbf{0.002} \\
+    DeepSeek-V4-Pro & 3.87 & 4.03 & +0.16 & 49779.0 & \textbf{0.004} & \textbf{0.004} \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
